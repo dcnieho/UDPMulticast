@@ -1,0 +1,12 @@
+*.suo
+*.ncb
+*.user
+Debug/
+Release/
+x64/
+*.sdf
+*.opensdf
+ipch
+*.asv
+matlab/texture/*
+*.swp
