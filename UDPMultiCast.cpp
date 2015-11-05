@@ -286,6 +286,9 @@ void UDPMultiCast::waitIOCPThreadsStop()
 {
 	// Wait for all threads to exit
 
+	if (_threads.empty())
+		return;
+
 	for (auto hThread : _threads)
 	{
 		if (WAIT_OBJECT_0 != ::WaitForSingleObject(hThread, INFINITE))
