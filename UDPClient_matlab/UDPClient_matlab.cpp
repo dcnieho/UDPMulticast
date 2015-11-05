@@ -148,8 +148,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		if (nlhs < 1 || nrhs < 2)
 			mexErrMsgTxt("getData: Unexpected arguments.");
 		// Call the method
-		std::vector<message> dataMsgs;
-		UDPinstance->getData(dataMsgs);
+		std::vector<message> dataMsgs = UDPinstance->getData();
 		// set output
 		const char* fieldNames[] = { "msg", "timeStamp" };
 		plhs[0] = mxCreateStructMatrix(1, dataMsgs.size(), sizeof(fieldNames) / sizeof(*fieldNames), fieldNames);
@@ -170,8 +169,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		if (nlhs < 1 || nrhs < 2)
 			mexErrMsgTxt("getCommands: Unexpected arguments.");
 		// Call the method
-		std::vector<message> cmdMsgs;
-		UDPinstance->getCommands(cmdMsgs);
+		std::vector<message> cmdMsgs = UDPinstance->getCommands();
 		// set output
 		const char* fieldNames[] = { "msg", "timeStamp" };
 		plhs[0] = mxCreateStructMatrix(1, cmdMsgs.size(), sizeof(fieldNames) / sizeof(*fieldNames), fieldNames);

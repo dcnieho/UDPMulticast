@@ -15,13 +15,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 		udp.sendWithTimeStamp("dat,1," + std::to_string(i), ',');
 	}
-	std::vector<message> dataMsgs;
-	udp.getData(dataMsgs);
+	std::vector<message> dataMsgs = udp.getData();
 	for (int i = 0; i < 20; i++)
 	{
 		udp.sendWithTimeStamp("dat,2," + std::to_string(i), ',');
 	}
-	udp.getData(dataMsgs);
+	std::vector<message> dataMsgs2 = udp.getData();
 
 
 	// send a bunch of messages
@@ -29,6 +28,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 		udp.send("cmd");
 	}
+	std::vector<message> cmdMsgs = udp.getCommands();
 
 	// send exit msg
 	udp.send("exit");
