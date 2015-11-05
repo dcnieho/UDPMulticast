@@ -15,6 +15,7 @@ UDPMultiCast::UDPMultiCast()
 
 UDPMultiCast::~UDPMultiCast()
 {
+	deInit();
 }
 
 void UDPMultiCast::init()
