@@ -16,8 +16,12 @@ dataMsgs2 = udp.getData();
 
 # send a bunch of commands
 for i in range(1, 10):
-    udp.send('cmd');
+    udp.send('cmd');    # testing empty string in message struct
 cmdMsgs = udp.getCommands();
+
+# test iterator
+for x in cmdMsgs:
+    print x.text
 
 # send exit msg
 udp.send('exit');
