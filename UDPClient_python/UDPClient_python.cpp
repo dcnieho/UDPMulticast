@@ -14,7 +14,7 @@ BOOST_PYTHON_MODULE(UDPClient_python)
 {
 	// need to expose our message struct (NB: boost.python doesn't do plain arrays, convert to string for an easy fix)
 	class_<message>("message")
-		.add_property("msg", static_cast<std::string(*)(const message&)>([](const message& m) {return std::string(m.text); }))
+		.add_property("text", static_cast<std::string(*)(const message&)>([](const message& m) {return std::string(m.text); }))	// casting to function pointer the ugly way as unary plus does not seems to work with VS2015
 		.add_property("timeStamp", &message::timeStamp);
 
 	// and a vector of messages

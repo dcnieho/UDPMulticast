@@ -177,7 +177,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 mxArray* msgVectorToMatlab(std::vector<message> msgs_)
 {
-	const char* fieldNames[] = { "msg", "timeStamp" };
+	const char* fieldNames[] = { "text", "timeStamp" };
 	mxArray* out = mxCreateStructMatrix(1, msgs_.size(), sizeof(fieldNames) / sizeof(*fieldNames), fieldNames);
 	size_t i = 0;
 	for (auto &msg : msgs_)
