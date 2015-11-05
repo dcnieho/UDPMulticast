@@ -1,7 +1,7 @@
 #include "../UDPMultiCast.h"
 #include "mex.h"
 #include "class_handle.hpp"
-#include "../utils.h"
+#include "../str2int.h"
 
 #include <cwchar>
 
