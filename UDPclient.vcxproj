@@ -125,6 +125,7 @@
   <ItemGroup>
     <ClInclude Include="includes.h" />
     <ClInclude Include="mpmcBoundedQueue.h" />
+    <ClInclude Include="str2int.h" />
     <ClInclude Include="types.h" />
     <ClInclude Include="UDPMultiCast.h" />
     <ClInclude Include="utils.h" />

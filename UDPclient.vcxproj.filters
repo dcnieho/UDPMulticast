@@ -38,5 +38,8 @@
     <ClInclude Include="mpmcBoundedQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="str2int.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
