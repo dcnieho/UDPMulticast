@@ -159,7 +159,7 @@ void UDPMultiCast::deInit()
 	_initialized = false;
 }
 
-void UDPMultiCast::sendWithTimeStamp(const std::string msg_, const char delim_)
+void UDPMultiCast::sendWithTimeStamp(const std::string msg_, const char delim_/* = ','*/)
 {
 	send(msg_ + delim_ + std::to_string(getTimeStamp()));
 }

@@ -15,7 +15,7 @@ public:
 	// set preferences before init or defaults will be used. 
 	void init();
 	void deInit();
-	void sendWithTimeStamp(const std::string msg_, const char delim_);
+	void sendWithTimeStamp(const std::string msg_, const char delim_ = ',');
 	void send(const std::string msg_);
 
 	// getters and setters
