@@ -12,14 +12,14 @@ for i=1:2048
 end
 dataMsgs = udp.getData;
 for i=1:20
-    udp.sendWithTimeStamp('dat,2,crap',',');
+    udp.sendWithTimeStamp('dat,2,crap');    % testing default delimiter
 end
 dataMsgs2 = udp.getData;
 
 
 % send a bunch of commands
 for i=1:10
-    udp.send('cmd');
+    udp.send('cmd');  % testing empty string in message struct
 end
 cmdMsgs = udp.getCommands;
 
