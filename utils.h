@@ -1,5 +1,6 @@
 #pragma once
 #include "includes.h"
+#include "str2int.h"
 
 #include <string>
 #include <sstream>
@@ -154,11 +155,6 @@ inline char *AllocateBufferSpace(
 	}
 
 	return pBuffer;
-}
-
-constexpr uint64_t str2int(const char* str, size_t h = 0)
-{
-	return !str[h] ? 5381ULL : (str2int(str, h + 1) * 33ULL) ^ str[h];
 }
 
 int64_t getTimeStamp();	// signed so we don't get in trouble if user does calculations with output that yield negative numbers
