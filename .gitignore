@@ -8,5 +8,8 @@ x64/
 *.opensdf
 ipch
 *.asv
-matlab/texture/*
 *.swp
+*.exp
+*.ilk
+*.lib
+*.pdb
