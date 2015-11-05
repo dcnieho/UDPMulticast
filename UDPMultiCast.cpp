@@ -400,7 +400,7 @@ unsigned int UDPMultiCast::threadFunction()
 				case  MsgAction::storeData:
 				{
 					message received;
-					received.text = msgLen >= headerLen ? _strdup(pExtOverlapped->buf.buf + headerLen) : nullptr;
+					received.text = msgLen >= headerLen ? _strdup(pExtOverlapped->buf.buf + headerLen) : new char{ '\0' };
 					received.timeStamp = timeStamp;
 					_receivedData.enqueue(received);
 					break;
@@ -408,7 +408,7 @@ unsigned int UDPMultiCast::threadFunction()
 				case  MsgAction::storeCommand:
 				{
 					message received;
-					received.text = msgLen >= headerLen ? _strdup(pExtOverlapped->buf.buf + headerLen) : nullptr;
+					received.text = msgLen >= headerLen ? _strdup(pExtOverlapped->buf.buf + headerLen) : new char{ '\0' };
 					received.timeStamp = timeStamp;
 					_receivedCommands.enqueue(received);
 					break;
