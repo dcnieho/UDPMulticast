@@ -5,6 +5,8 @@
 
 #include <cwchar>
 
+mxArray* msgVectorToMatlab(std::vector<message> msgs_);
+
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 	// Get the command string
@@ -154,48 +156,39 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		UDPinstance->setPort(static_cast<unsigned short>(mxGetScalar(prhs[2])));
 		return;
 	case str2int("getData"):
-	{
 		// Check parameters
 		if (nlhs < 1 || nrhs < 2)
 			mexErrMsgTxt("getData: Unexpected arguments.");
 		// Call the method
-		std::vector<message> dataMsgs = UDPinstance->getData();
-		// set output
-		const char* fieldNames[] = { "msg", "timeStamp" };
-		plhs[0] = mxCreateStructMatrix(1, dataMsgs.size(), sizeof(fieldNames) / sizeof(*fieldNames), fieldNames);
-		size_t i = 0;
-		for (auto &msg : dataMsgs)
-		{
-			mxSetFieldByNumber(plhs[0], i, 0, mxCreateString(msg.text));
-			mxArray *temp;
-			mxSetFieldByNumber(plhs[0], i, 1, temp=mxCreateNumericMatrix(1,1, mxINT64_CLASS, mxREAL));
-			*static_cast<long long*>(mxGetData(temp)) = msg.timeStamp;
-			i++;
-		}
+		plhs[0] = msgVectorToMatlab(UDPinstance->getData());
 		return;
-	}
 	case str2int("getCommands"):
-	{
 		// Check parameters
 		if (nlhs < 1 || nrhs < 2)
 			mexErrMsgTxt("getCommands: Unexpected arguments.");
 		// Call the method
-		std::vector<message> cmdMsgs = UDPinstance->getCommands();
-		// set output
-		const char* fieldNames[] = { "msg", "timeStamp" };
-		plhs[0] = mxCreateStructMatrix(1, cmdMsgs.size(), sizeof(fieldNames) / sizeof(*fieldNames), fieldNames);
-		size_t i = 0;
-		for (auto &msg : cmdMsgs)
-		{
-			mxSetFieldByNumber(plhs[0], i, 0, mxCreateString(msg.text));
-			i++;
-		}
+		plhs[0] = msgVectorToMatlab(UDPinstance->getCommands());
 		return;
-	}
 	default:
 		// Got here, so command not recognized
 		mexErrMsgTxt("Command not recognized.");
 	}
+}
+
+mxArray* msgVectorToMatlab(std::vector<message> msgs_)
+{
+	const char* fieldNames[] = { "msg", "timeStamp" };
+	mxArray* out = mxCreateStructMatrix(1, msgs_.size(), sizeof(fieldNames) / sizeof(*fieldNames), fieldNames);
+	size_t i = 0;
+	for (auto &msg : msgs_)
+	{
+		mxSetFieldByNumber(out, i, 0, mxCreateString(msg.text));
+		mxArray *temp;
+		mxSetFieldByNumber(out, i, 1, temp = mxCreateNumericMatrix(1, 1, mxINT64_CLASS, mxREAL));
+		*static_cast<long long*>(mxGetData(temp)) = msg.timeStamp;
+		i++;
+	}
+	return out;
 }
 
 
