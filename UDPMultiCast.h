@@ -25,9 +25,8 @@ public:
 	void setGroupAddress(const std::string& groupAddress_);
 	unsigned short getPort() const { return _port; }
 	void setPort(const unsigned short& port_);
-	// appends data or commands to provided vector, clearing vector is optional and caller's responsibility
-	void getData(std::vector<message>& dataMsgs_);
-	void getCommands(std::vector<message>& commandMsgs_);
+	std::vector<message> getData();
+	std::vector<message> getCommands();
 
 private:
 	void sendInternal(EXTENDED_OVERLAPPED* sendOverlapped_);

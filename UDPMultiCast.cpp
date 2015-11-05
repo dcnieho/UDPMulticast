@@ -246,21 +246,34 @@ void UDPMultiCast::setPort(const unsigned short& port_)
 	_port = port_;
 }
 
-void UDPMultiCast::getData(std::vector<message>& dataMsgs_)
+std::vector<message> UDPMultiCast::getData()
 {
+	std::vector<message> dataMsgs;
 	while (true)
 	{
 		message temp;
 		bool success = _receivedData.dequeue(temp);
 		if (success)
-			dataMsgs_.push_back(std::move(temp));
+			dataMsgs.push_back(std::move(temp));
 		else
 			break;
 	}
+	return dataMsgs;
 }
 
-void UDPMultiCast::getCommands(std::vector<message>& commandMsgs_)
+std::vector<message> UDPMultiCast::getCommands()
 {
+	std::vector<message> commandMsgs;
+	while (true)
+	{
+		message temp;
+		bool success = _receivedCommands.dequeue(temp);
+		if (success)
+			commandMsgs.push_back(std::move(temp));
+		else
+			break;
+	}
+	return commandMsgs;
 }
 
 void UDPMultiCast::stopIOCP()
