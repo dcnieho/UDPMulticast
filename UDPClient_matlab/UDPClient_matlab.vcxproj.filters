@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="m-files">
+      <UniqueIdentifier>{4231e2af-4d8f-42a2-bfb9-dde94724e1c8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="class_handle.hpp">
@@ -23,5 +26,13 @@
     <ClCompile Include="UDPClient_matlab.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="UDPClient.m">
+      <Filter>m-files</Filter>
+    </None>
+    <None Include="UDPClientTest.m">
+      <Filter>m-files</Filter>
+    </None>
   </ItemGroup>
 </Project>

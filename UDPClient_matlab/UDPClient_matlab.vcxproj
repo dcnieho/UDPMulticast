@@ -74,7 +74,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetExt>.mexw64</TargetExt>
-    <OutDir>.</OutDir>
+    <OutDir>.\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -137,6 +137,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="class_handle.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="UDPClient.m" />
+    <None Include="UDPClientTest.m" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
