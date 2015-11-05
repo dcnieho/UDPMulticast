@@ -27,7 +27,7 @@ public:
 	void getCommands(std::vector<message>& commandMsgs_);
 
 private:
-	void send(EXTENDED_OVERLAPPED* sendOverlapped_);
+	void sendInternal(EXTENDED_OVERLAPPED* sendOverlapped_);
 	void receive(EXTENDED_OVERLAPPED* pExtOverlapped_, OVERLAPPED* pOverlapped = nullptr);
 	void stopIOCP();
 	void checkIOCPThreads();

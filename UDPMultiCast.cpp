@@ -180,10 +180,10 @@ void UDPMultiCast::send(const std::string msg_)
 	}
 	//cout << "sending:  \"" << _sendOverlapped.buf.buf << "\"" << endl;
 
-	send(sendOverlapped);
+	sendInternal(sendOverlapped);
 }
 
-void UDPMultiCast::send(EXTENDED_OVERLAPPED * sendOverlapped_)
+void UDPMultiCast::sendInternal(EXTENDED_OVERLAPPED * sendOverlapped_)
 {
 	// do send
 	DWORD bytesSent = 0;
@@ -344,7 +344,7 @@ unsigned int UDPMultiCast::threadFunction()
 				else
 				{
 					// attempt resend (NB: don't update timestamp, this is processing latency here...)
-					send(pExtOverlapped);
+					sendInternal(pExtOverlapped);
 				}
 			}
 			continue;
