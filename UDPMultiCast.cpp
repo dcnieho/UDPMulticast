@@ -218,7 +218,7 @@ void UDPMultiCast::receive(EXTENDED_OVERLAPPED* pExtOverlapped_, OVERLAPPED* pOv
 	}
 }
 
-void UDPMultiCast::setLoopBack(const BOOL loopBack_)
+void UDPMultiCast::setLoopBack(const BOOL& loopBack_)
 {
 	if (_initialized)
 	{
@@ -227,7 +227,7 @@ void UDPMultiCast::setLoopBack(const BOOL loopBack_)
 	_loopBack = loopBack_;
 }
 
-void UDPMultiCast::setGroupAddress(const char * groupAddress_)
+void UDPMultiCast::setGroupAddress(const std::string& groupAddress_)
 {
 	// join old group, if any
 	leaveMultiCast();
@@ -238,7 +238,7 @@ void UDPMultiCast::setGroupAddress(const char * groupAddress_)
 	setupLoopBack(_loopBack);
 }
 
-void UDPMultiCast::setPort(const unsigned short port_)
+void UDPMultiCast::setPort(const unsigned short& port_)
 {
 	if (_initialized)
 		ErrorMsgExit("cannot set port when already initialized");

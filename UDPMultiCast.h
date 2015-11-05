@@ -2,6 +2,7 @@
 #include "includes.h"
 #include "types.h"
 #include <vector>
+#include <string>
 
 
 
@@ -18,10 +19,12 @@ public:
 	void send(const std::string msg_);
 
 	// getters and setters
-	const BOOL& getLoopBack() { return _loopBack; }
-	void setLoopBack(const BOOL loopBack_);
-	void setGroupAddress(const char* groupAddress_);
-	void setPort(const unsigned short port_);
+	BOOL getLoopBack() const { return _loopBack; }
+	void setLoopBack(const BOOL& loopBack_);
+	std::string getGroupAddress() const { return _groupAddress; }
+	void setGroupAddress(const std::string& groupAddress_);
+	unsigned short getPort() const { return _port; }
+	void setPort(const unsigned short& port_);
 	// appends data or commands to provided vector, clearing vector is optional and caller's responsibility
 	void getData(std::vector<message>& dataMsgs_);
 	void getCommands(std::vector<message>& commandMsgs_);
