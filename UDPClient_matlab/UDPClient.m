@@ -37,8 +37,14 @@ classdef UDPClient < handle
         function setLoopBack(this, varargin)
             UDPClient_matlab('setLoopBack', this.objectHandle, varargin{:});
         end
+        function groupAddress = getGroupAddress(this)
+            groupAddress = UDPClient_matlab('getGroupAddress', this.objectHandle);
+        end
         function setGroupAddress(this, varargin)
             UDPClient_matlab('setGroupAddress', this.objectHandle, varargin{:});
+        end
+        function port = getPort(this)
+            port = UDPClient_matlab('getPort', this.objectHandle);
         end
         function setPort(this, varargin)
             UDPClient_matlab('setPort', this.objectHandle, varargin{:});

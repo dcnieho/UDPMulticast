@@ -95,15 +95,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		return;
 	}
 	case str2int("getLoopBack"):
-	{
 		// Check parameters
 		if (nlhs < 1 || nrhs < 2)
-			mexErrMsgTxt("Train: Unexpected arguments.");
+			mexErrMsgTxt("getLoopBack: Unexpected arguments.");
 		// Call the method
-		auto loopback = !!UDPinstance->getLoopBack();
-		plhs[0] = mxCreateLogicalScalar(loopback);
+		plhs[0] = mxCreateLogicalScalar(!!UDPinstance->getLoopBack());
 		return;
-	}
 	case str2int("setLoopBack"):
 	{
 		// Check parameters
@@ -120,6 +117,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		UDPinstance->setLoopBack(loopback);
 		return;
 	}
+	case str2int("getGroupAddress"):
+		// Check parameters
+		if (nlhs < 1 || nrhs < 2)
+			mexErrMsgTxt("getGroupAddress: Unexpected arguments.");
+		// Call the method
+		plhs[0] = mxCreateString(UDPinstance->getGroupAddress().c_str());
+		return;
 	case str2int("setGroupAddress"):
 	{
 		// Check parameters
@@ -133,6 +137,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		mxFree(str);
 		return;
 	}
+	case str2int("getPort"):
+		// Check parameters
+		if (nlhs < 1 || nrhs < 2)
+			mexErrMsgTxt("getPort: Unexpected arguments.");
+		// Call the method
+		plhs[0] = mxCreateDoubleScalar(UDPinstance->getPort());
+		return;
 	case str2int("setPort"):
 		// Check parameters
 		if (nlhs < 0 || nrhs < 3)
