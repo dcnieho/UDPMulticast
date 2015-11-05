@@ -2,6 +2,7 @@
 
 udp = UDPClient();
 udp.setPort(4444);
+udp.getGroupAddress()
 udp.init();
 udp.setLoopBack(true);
 
