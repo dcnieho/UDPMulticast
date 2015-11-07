@@ -96,6 +96,20 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		mxFree(str);
 		return;
 	}
+	case str2int("getData"):
+		// Check parameters
+		if (nlhs < 1 || nrhs < 2)
+			mexErrMsgTxt("getData: Unexpected arguments.");
+		// Call the method
+		plhs[0] = msgVectorToMatlab(UDPinstance->getData());
+		return;
+	case str2int("getCommands"):
+		// Check parameters
+		if (nlhs < 1 || nrhs < 2)
+			mexErrMsgTxt("getCommands: Unexpected arguments.");
+		// Call the method
+		plhs[0] = msgVectorToMatlab(UDPinstance->getCommands());
+		return;
 	case str2int("getLoopBack"):
 		// Check parameters
 		if (nlhs < 1 || nrhs < 2)
@@ -155,19 +169,53 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		// Call the method
 		UDPinstance->setPort(static_cast<unsigned short>(mxGetScalar(prhs[2])));
 		return;
-	case str2int("getData"):
+	case str2int("getBufferSize"):
 		// Check parameters
 		if (nlhs < 1 || nrhs < 2)
-			mexErrMsgTxt("getData: Unexpected arguments.");
+			mexErrMsgTxt("getBufferSize: Unexpected arguments.");
 		// Call the method
-		plhs[0] = msgVectorToMatlab(UDPinstance->getData());
+		plhs[0] = mxCreateDoubleScalar(UDPinstance->getBufferSize());
 		return;
-	case str2int("getCommands"):
+	case str2int("setBufferSize"):
+		// Check parameters
+		if (nlhs < 0 || nrhs < 3)
+			mexErrMsgTxt("setBufferSize: Expected buffer size input.");
+		if (!mxIsDouble(prhs[2]) || mxIsComplex(prhs[2]) || !mxIsScalar(prhs[2]))
+			mexErrMsgTxt("setBufferSize: Expected argument to be a double scalar.");
+		// Call the method
+		UDPinstance->setBufferSize(static_cast<size_t>(mxGetScalar(prhs[2])));
+		return;
+	case str2int("getNumQueuedReceives"):
 		// Check parameters
 		if (nlhs < 1 || nrhs < 2)
-			mexErrMsgTxt("getCommands: Unexpected arguments.");
+			mexErrMsgTxt("getNumQueuedReceives: Unexpected arguments.");
 		// Call the method
-		plhs[0] = msgVectorToMatlab(UDPinstance->getCommands());
+		plhs[0] = mxCreateDoubleScalar(UDPinstance->getNumQueuedReceives());
+		return;
+	case str2int("setNumQueuedReceives"):
+		// Check parameters
+		if (nlhs < 0 || nrhs < 3)
+			mexErrMsgTxt("setNumQueuedReceives: Expected number of queued receives input.");
+		if (!mxIsDouble(prhs[2]) || mxIsComplex(prhs[2]) || !mxIsScalar(prhs[2]))
+			mexErrMsgTxt("setNumQueuedReceives: Expected argument to be a double scalar.");
+		// Call the method
+		UDPinstance->setNumQueuedReceives(static_cast<unsigned long>(mxGetScalar(prhs[2])));
+		return;
+	case str2int("getNumReceiverThreads"):
+		// Check parameters
+		if (nlhs < 1 || nrhs < 2)
+			mexErrMsgTxt("getNumReceiverThreads: Unexpected arguments.");
+		// Call the method
+		plhs[0] = mxCreateDoubleScalar(UDPinstance->getNumReceiverThreads());
+		return;
+	case str2int("setNumReceiverThreads"):
+		// Check parameters
+		if (nlhs < 0 || nrhs < 3)
+			mexErrMsgTxt("setNumReceiverThreads: Expected number of receiver threads input.");
+		if (!mxIsDouble(prhs[2]) || mxIsComplex(prhs[2]) || !mxIsScalar(prhs[2]))
+			mexErrMsgTxt("setNumReceiverThreads: Expected argument to be a double scalar.");
+		// Call the method
+		UDPinstance->setNumReceiverThreads(static_cast<unsigned long>(mxGetScalar(prhs[2])));
 		return;
 	default:
 		// Got here, so command not recognized

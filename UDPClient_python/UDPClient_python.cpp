@@ -17,6 +17,8 @@ BOOST_PYTHON_MODULE(UDPClient_python)
 	// maybe we can do a bit better when we learn from <boost/python/tuple.hpp>
 	// may need this:
 	// http://stackoverflow.com/questions/2135457/how-to-write-a-wrapper-over-functions-and-member-functions-that-executes-some-co
+	// make a second getdata function (getDataNTL for named tuple list). Test which one is faster so we have a recommended function,
+	// but keep both. preferred is simply called getData, non-preferred getDataNTL or getDataSL.
 
 	// need to expose our message struct (NB: boost.python doesn't do plain arrays, convert to string for an easy fix)
 	class_<message>("message")
@@ -32,11 +34,14 @@ BOOST_PYTHON_MODULE(UDPClient_python)
 		.def("deInit", &UDPMultiCast::deInit)
 		.def("sendWithTimeStamp", &UDPMultiCast::sendWithTimeStamp, send_overloads())
 		.def("send", &UDPMultiCast::send)
+		.def("getData", &UDPMultiCast::getData)
+		.def("getCommands", &UDPMultiCast::getCommands)
 		.add_property("loopBack", &UDPMultiCast::getLoopBack, &UDPMultiCast::setLoopBack)
 		.add_property("groupAddress", &UDPMultiCast::getGroupAddress, &UDPMultiCast::setGroupAddress)
 		.add_property("port", &UDPMultiCast::getPort, &UDPMultiCast::setPort)
-		.def("getData", &UDPMultiCast::getData)
-		.def("getCommands", &UDPMultiCast::getCommands)
+		.add_property("bufferSize", &UDPMultiCast::getBufferSize, &UDPMultiCast::setBufferSize)
+		.add_property("numQueuedReceives", &UDPMultiCast::getNumQueuedReceives, &UDPMultiCast::setNumQueuedReceives)
+		.add_property("numReceiverThreads", &UDPMultiCast::getNumReceiverThreads, &UDPMultiCast::setNumReceiverThreads)
 		;
 }
 
