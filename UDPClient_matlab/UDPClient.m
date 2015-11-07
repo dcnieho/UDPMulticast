@@ -30,6 +30,14 @@ classdef UDPClient < handle
             UDPClient_matlab('send', this.objectHandle, varargin{:});
         end
         
+        % get the data and command messages received since the last call to this function
+        function data = getData(this)
+            data = UDPClient_matlab('getData', this.objectHandle);
+        end
+        function cmds = getCommands(this)
+            cmds = UDPClient_matlab('getCommands', this.objectHandle);
+        end
+        
         % getters and setters
         function loopback = getLoopBack(this)
             loopback = UDPClient_matlab('getLoopBack', this.objectHandle);
@@ -49,11 +57,23 @@ classdef UDPClient < handle
         function setPort(this, varargin)
             UDPClient_matlab('setPort', this.objectHandle, varargin{:});
         end
-        function data = getData(this)
-            data = UDPClient_matlab('getData', this.objectHandle);
+        function bufferSize = getBufferSize(this)
+            bufferSize = UDPClient_matlab('getBufferSize', this.objectHandle);
         end
-        function cmds = getCommands(this)
-            cmds = UDPClient_matlab('getCommands', this.objectHandle);
+        function setBufferSize(this, varargin)
+            UDPClient_matlab('setBufferSize', this.objectHandle, varargin{:});
+        end
+        function numQueuedReceives = getNumQueuedReceives(this)
+            numQueuedReceives = UDPClient_matlab('getNumQueuedReceives', this.objectHandle);
+        end
+        function setNumQueuedReceives(this, varargin)
+            UDPClient_matlab('setNumQueuedReceives', this.objectHandle, varargin{:});
+        end
+        function numReceiverThreads = getNumReceiverThreads(this)
+            numReceiverThreads = UDPClient_matlab('getNumReceiverThreads', this.objectHandle);
+        end
+        function setNumReceiverThreads(this, varargin)
+            UDPClient_matlab('setNumReceiverThreads', this.objectHandle, varargin{:});
         end
     end
 end
