@@ -31,10 +31,13 @@ int _tmain(int argc, _TCHAR* argv[])
 	std::vector<message> cmdMsgs = udp.getCommands();
 
 	// send exit msg
+	std::cout << "nThreads active: " << udp.checkReceiverThreads() << std::endl;
 	udp.send("exit");
+	std::cout << "nThreads active: " << udp.checkReceiverThreads() << std::endl;
 
 	// clean up
 	udp.deInit();
+	std::cout << "nThreads active: " << udp.checkReceiverThreads() << std::endl;
 	
 
 	return 0;

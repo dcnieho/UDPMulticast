@@ -24,7 +24,10 @@ end
 cmdMsgs = udp.getCommands;
 
 % send exit msg
+fprintf('nThreads active: %i\n',udp.checkReceiverThreads);
 udp.send('exit');
+fprintf('nThreads active: %i\n',udp.checkReceiverThreads);
 
 % clean up
 udp.deInit();
+fprintf('nThreads active: %i\n',udp.checkReceiverThreads);

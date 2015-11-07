@@ -17,6 +17,7 @@ dataMsgs2 = udp.getData();
 # send a bunch of commands
 for i in range(1, 10):
     udp.send('cmd');    # testing empty string in message struct
+udp.send('cmd,you should see this');
 cmdMsgs = udp.getCommands();
 
 # test iterator
@@ -24,7 +25,10 @@ for x in cmdMsgs:
     print x.text
 
 # send exit msg
+print "nThreads active: " + str(udp.checkReceiverThreads())
 udp.send('exit');
+print "nThreads active: " + str(udp.checkReceiverThreads())
 
 # clean up
 udp.deInit();
+print "nThreads active: " + str(udp.checkReceiverThreads())
