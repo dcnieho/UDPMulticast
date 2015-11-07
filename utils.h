@@ -121,7 +121,7 @@ inline TV RoundUp(TV Value, TM Multiple)
 
 inline char *AllocateBufferSpace(
 	const size_t recvBufferSize,
-	const DWORD pendingRecvs,
+	const unsigned long pendingRecvs,
 	DWORD &receiveBuffersAllocated)
 {
 	const DWORD preferredNumaNode = 0;

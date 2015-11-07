@@ -60,13 +60,14 @@ private:
 	queue_t<2048> _receivedData;
 	queue_t<128>  _receivedCommands;
 
-	// user prefs, with defaults
-	size_t _bufferSize = 4096;
-	DWORD _IOCPPendingReceives = 5000;
-	DWORD _numIOCPThreads = 8;	// doesn't hurt to have more than number of logical CPU cores, new threads only awakened if others blocked
+	// params and user prefs, with defaults
 	DWORD _spinCount = 4000;
-	// more prefs, these can be changed after init (TODO)
+	// these can be set
+	size_t _bufferSize = 4096;
+	unsigned long _IOCPPendingReceives = 5000;
+	unsigned long _numIOCPThreads = 8;	// doesn't hurt to have more than number of logical CPU cores, new threads only awakened if others blocked
 	unsigned short _port = 10000;
+	// more prefs, these can be changed after init
 	std::string _groupAddress = "224.0.0.9";
 	BOOL _loopBack = FALSE;
 };
