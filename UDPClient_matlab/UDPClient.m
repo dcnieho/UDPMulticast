@@ -29,6 +29,12 @@ classdef UDPClient < handle
         function send(this, varargin)
             UDPClient_matlab('send', this.objectHandle, varargin{:});
         end
+        % check if receiver threads are still running. They may close when
+        % an exit message is received. function returns how many threads
+        % are running
+        function numRunning = checkReceiverThreads(this)
+            numRunning = UDPClient_matlab('checkReceiverThreads', this.objectHandle);
+        end
         
         % get the data and command messages received since the last call to this function
         function data = getData(this)

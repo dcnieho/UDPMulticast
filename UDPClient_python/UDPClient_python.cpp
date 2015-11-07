@@ -34,10 +34,17 @@ BOOST_PYTHON_MODULE(UDPClient_python)
 		.def("deInit", &UDPMultiCast::deInit)
 		.def("sendWithTimeStamp", &UDPMultiCast::sendWithTimeStamp, send_overloads())
 		.def("send", &UDPMultiCast::send)
+		.def("checkReceiverThreads",&UDPMultiCast::checkReceiverThreads)
+
+		// get the data and command messages received since the last call to this function
 		.def("getData", &UDPMultiCast::getData)
 		.def("getCommands", &UDPMultiCast::getCommands)
+
+		// getters and setters
+		// these can be called at any time
 		.add_property("loopBack", &UDPMultiCast::getLoopBack, &UDPMultiCast::setLoopBack)
 		.add_property("groupAddress", &UDPMultiCast::getGroupAddress, &UDPMultiCast::setGroupAddress)
+		// these can only be called before init is called
 		.add_property("port", &UDPMultiCast::getPort, &UDPMultiCast::setPort)
 		.add_property("bufferSize", &UDPMultiCast::getBufferSize, &UDPMultiCast::setBufferSize)
 		.add_property("numQueuedReceives", &UDPMultiCast::getNumQueuedReceives, &UDPMultiCast::setNumQueuedReceives)

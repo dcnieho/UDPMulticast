@@ -96,6 +96,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		mxFree(str);
 		return;
 	}
+	case str2int("checkReceiverThreads"):
+		// Check parameters
+		if (nlhs < 1 || nrhs < 2)
+			mexErrMsgTxt("checkReceiverThreads: Unexpected arguments.");
+		// Call the method
+		plhs[0] = mxCreateDoubleScalar(UDPinstance->checkReceiverThreads());
+		return;
 	case str2int("getData"):
 		// Check parameters
 		if (nlhs < 1 || nrhs < 2)
