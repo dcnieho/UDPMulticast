@@ -12,11 +12,13 @@ public:
 	UDPMultiCast();
 	~UDPMultiCast();
 
-	// set preferences before init or defaults will be used. 
 	void init();
 	void deInit();
 	void sendWithTimeStamp(const std::string msg_, const char delim_ = ',');
 	void send(const std::string msg_);
+	// check if receiver threads are still running. They may close when an exit message is received
+	// function returns how many threads are running
+	int  checkReceiverThreads();
 
 	// get the data and command messages received since the last call to this function
 	std::vector<message> getData();
@@ -42,7 +44,6 @@ private:
 	void sendInternal(EXTENDED_OVERLAPPED* sendOverlapped_);
 	void receive(EXTENDED_OVERLAPPED* pExtOverlapped_, OVERLAPPED* pOverlapped = nullptr);
 	void stopIOCP();
-	void checkIOCPThreads();
 	void waitIOCPThreadsStop();
 	static unsigned int __stdcall startThreadFunction(void *pV);
 	unsigned int threadFunction();
@@ -59,6 +60,7 @@ private:
 	bool _initialized = false;
 	SOCKET _socket;
 	HANDLE _hIOCP;
+	bool _haveCriticalSection = false;
 	CRITICAL_SECTION _criticalSection;
 	Threads _threads;
 	bool _multiCastJoined = false;

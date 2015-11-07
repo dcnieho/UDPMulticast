@@ -102,6 +102,7 @@ void UDPMultiCast::init()
 
 	// Create IOCP processing threads
 	::InitializeCriticalSectionAndSpinCount(&_criticalSection, _spinCount);
+	_haveCriticalSection = true;
 
 	// Start our worker threads
 	for (DWORD i = 0; i < _numIOCPThreads; ++i)
@@ -310,7 +311,7 @@ void UDPMultiCast::waitIOCPThreadsStop()
 {
 	// Wait for all threads to exit
 
-	if (_threads.empty())
+	if (_threads.empty() && !_haveCriticalSection)
 		return;
 
 	for (auto hThread : _threads)
@@ -325,12 +326,12 @@ void UDPMultiCast::waitIOCPThreadsStop()
 	_threads.clear();
 
 	::DeleteCriticalSection(&_criticalSection);
+	_haveCriticalSection = false;
 }
 
-void UDPMultiCast::checkIOCPThreads()
+int UDPMultiCast::checkReceiverThreads()
 {
 	// Check if threads still active
-
 	for (auto it = _threads.begin(); it != _threads.end(); ++it)
 	{
 		if (WAIT_OBJECT_0 == ::WaitForSingleObject(*it, 0))
@@ -338,13 +339,16 @@ void UDPMultiCast::checkIOCPThreads()
 			::CloseHandle(*it);
 			it = _threads.erase(it);
 		}
-
 	}
 
-	if (_threads.empty())
+	if (_threads.empty() && _haveCriticalSection)
 	{
+		std::cout << "all threads dead" << std::endl;
 		::DeleteCriticalSection(&_criticalSection);
+		_haveCriticalSection = false;
 	}
+
+	return static_cast<int>(_threads.size());
 }
 
 unsigned int UDPMultiCast::startThreadFunction(void *pV)
