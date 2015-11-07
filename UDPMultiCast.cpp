@@ -246,6 +246,30 @@ void UDPMultiCast::setPort(const unsigned short& port_)
 	_port = port_;
 }
 
+void UDPMultiCast::setBufferSize(const size_t & bufferSize_)
+{
+	if (_initialized)
+		ErrorMsgExit("cannot set buffer size when already initialized");
+
+	_bufferSize = bufferSize_;
+}
+
+void UDPMultiCast::setNumQueuedReceives(const unsigned long & IOCPPendingReceives_)
+{
+	if (_initialized)
+		ErrorMsgExit("cannot set number of queued receives when already initialized");
+
+	_IOCPPendingReceives = IOCPPendingReceives_;
+}
+
+void UDPMultiCast::setNumReceiverThreads(const unsigned long & numIOCPThreads_)
+{
+	if (_initialized)
+		ErrorMsgExit("cannot set number of receiver threads when already initialized");
+
+	_numIOCPThreads = numIOCPThreads_;
+}
+
 std::vector<message> UDPMultiCast::getData()
 {
 	std::vector<message> dataMsgs;

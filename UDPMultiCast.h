@@ -18,15 +18,25 @@ public:
 	void sendWithTimeStamp(const std::string msg_, const char delim_ = ',');
 	void send(const std::string msg_);
 
+	// get the data and command messages received since the last call to this function
+	std::vector<message> getData();
+	std::vector<message> getCommands();
+
 	// getters and setters
+	// these can be called at any time
 	BOOL getLoopBack() const { return _loopBack; }
 	void setLoopBack(const BOOL& loopBack_);
 	std::string getGroupAddress() const { return _groupAddress; }
 	void setGroupAddress(const std::string& groupAddress_);
+	// these can only be called before init is called
 	unsigned short getPort() const { return _port; }
 	void setPort(const unsigned short& port_);
-	std::vector<message> getData();
-	std::vector<message> getCommands();
+	size_t getBufferSize() const { return _bufferSize; }
+	void setBufferSize(const size_t& bufferSize_);
+	unsigned long getNumQueuedReceives() const { return _IOCPPendingReceives; };
+	void setNumQueuedReceives(const unsigned long& IOCPPendingReceives_);
+	unsigned long getNumReceiverThreads() const { return _numIOCPThreads; };
+	void setNumReceiverThreads(const unsigned long& numIOCPThreads_);
 
 private:
 	void sendInternal(EXTENDED_OVERLAPPED* sendOverlapped_);
