@@ -1,5 +1,7 @@
 #pragma comment(lib, "ws2_32.lib")
 // note, would use RIO if did not have to be compatible with Windows 7, but current approach is performant enough
+// the code handling IOCP in this implementation is based on the server presented here:
+// http://www.serverframework.com/asynchronousevents/2012/08/winsock-registered-io---traditional-multi-threaded-iocp-udp-example-server.html
 
 #include "UDPMultiCast.h"
 
