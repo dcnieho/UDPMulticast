@@ -21,6 +21,9 @@ public:
 	int  checkReceiverThreads();
 
 	// get the data and command messages received since the last call to this function
+	// right now these are distinguished by putting dat or cmd in front of each message
+	// in the final version, we'd have data coming in over UDP and commands over TCP, that
+	// would be how they're distinguished.
 	std::vector<message> getData();
 	std::vector<message> getCommands();
 
