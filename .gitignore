@@ -1,6 +1,7 @@
 *.suo
 *.ncb
 *.user
+*.opendb
 Debug/
 Release/
 x64/
