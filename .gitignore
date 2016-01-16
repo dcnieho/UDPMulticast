@@ -14,3 +14,4 @@ ipch
 *.ilk
 *.lib
 *.pdb
+git_refid.h
