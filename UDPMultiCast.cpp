@@ -6,6 +6,7 @@
 #include "UDPMultiCast.h"
 
 #include "utils.h"
+#include "git_refid.h"
 
 #include <iostream>
 #include <process.h>
@@ -219,6 +220,11 @@ void UDPMultiCast::receive(EXTENDED_OVERLAPPED* pExtOverlapped_, OVERLAPPED* pOv
 			ErrorExit("WSARecvFrom", __LINE__, lastError);
 		}
 	}
+}
+
+std::string UDPMultiCast::getGitRefID() const
+{
+	return GIT_REFID;
 }
 
 void UDPMultiCast::setLoopBack(const BOOL& loopBack_)

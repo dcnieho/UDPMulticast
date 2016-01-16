@@ -29,6 +29,7 @@ public:
 
 	// getters and setters
 	// these can be called at any time
+	std::string getGitRefID() const;	// implemented in cpp as frequent changes would trigger frequent complete recompiles...
 	BOOL getLoopBack() const { return _loopBack; }
 	void setLoopBack(const BOOL& loopBack_);
 	std::string getGroupAddress() const { return _groupAddress; }
