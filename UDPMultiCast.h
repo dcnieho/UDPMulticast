@@ -71,7 +71,8 @@ private:
 	ip_mreq _multiCastRequest;
 	sockaddr_in _multiCastGroup;
 	// buffers
-	char *_pReceiveBuffers;	// allocated with VirtualAllocExNuma. TODO: why?
+	char *_pReceiveBuffers;
+	sockaddr_in *_pAddrBuffers;
 	EXTENDED_OVERLAPPED *_pExtOverlappedArray;
 	queue_t<2048> _receivedData;
 	queue_t<128>  _receivedCommands;

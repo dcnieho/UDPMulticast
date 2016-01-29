@@ -8,7 +8,7 @@
 struct EXTENDED_OVERLAPPED : public OVERLAPPED
 {
 	WSABUF buf;
-	sockaddr addr;
+	sockaddr_in* addr = nullptr;
 	int addrLen;
 	BOOL isRead;
 };
@@ -18,14 +18,14 @@ typedef std::deque<HANDLE> Threads;
 struct message
 {
 	char* text;
-	int64_t timeStamp;
-	// source ip
+	int64_t timeStamp;	// receive timestamp
+	char  ip[INET_ADDRSTRLEN] = { '\0' };	// source ip
 
 	// need comparison operator for boost.python objects contained in vectors
 	// see http://stackoverflow.com/questions/10680691/why-do-i-need-comparison-operators-in-boost-python-vector-indexing-suite
 	bool message::operator ==(const message &b) const
 	{
-		return timeStamp == b.timeStamp && strcmp(text, b.text);
+		return timeStamp == b.timeStamp && !strcmp(text, b.text) && !strcmp(ip, b.ip);	// strcmp outputs 0 when inputs identical
 	};
 };
 template <size_t buffer_size>

@@ -119,11 +119,14 @@ inline TV RoundUp(TV Value, TM Multiple)
 }
 
 
-inline char *AllocateBufferSpace(
-	const size_t recvBufferSize,
-	const unsigned long pendingRecvs,
-	DWORD &receiveBuffersAllocated)
+inline LPVOID AllocateBufferSpace(
+	const size_t bufferSize,
+	const unsigned long nBuffers,
+	DWORD &nBuffersAllocated)
 {
+	// with modern processors, there is normally only one NUMA node per socket,
+	// which means the below NUMA stuff is of no relevance for our usage cases
+	// might as well keep it though
 	const DWORD preferredNumaNode = 0;
 
 	SYSTEM_INFO systemInfo;
@@ -134,7 +137,7 @@ inline char *AllocateBufferSpace(
 
 	const unsigned __int64 granularity = systemInfo.dwAllocationGranularity;
 
-	const unsigned __int64 desiredSize = recvBufferSize * pendingRecvs;
+	const unsigned __int64 desiredSize = bufferSize * nBuffers;
 
 	unsigned __int64 actualSize = RoundUp(desiredSize, granularity);
 
@@ -143,15 +146,14 @@ inline char *AllocateBufferSpace(
 		actualSize = (std::numeric_limits<DWORD>::max() / granularity) * granularity;
 	}
 
-	receiveBuffersAllocated = std::min<DWORD>(pendingRecvs, static_cast<DWORD>(actualSize / recvBufferSize));
+	nBuffersAllocated = std::min<DWORD>(nBuffers, static_cast<DWORD>(actualSize / bufferSize));
 
-	DWORD bufferSize = static_cast<DWORD>(actualSize);
-
-	char *pBuffer = reinterpret_cast<char *>(VirtualAllocExNuma(GetCurrentProcess(), 0, bufferSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE, preferredNumaNode));
+	DWORD totalBufferSize = static_cast<DWORD>(actualSize);
+	LPVOID pBuffer = VirtualAllocExNuma(GetCurrentProcess(), 0, totalBufferSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE, preferredNumaNode);
 
 	if (pBuffer == 0)
 	{
-		ErrorExit("VirtualAlloc");
+		ErrorExit("VirtualAllocExNuma");
 	}
 
 	return pBuffer;

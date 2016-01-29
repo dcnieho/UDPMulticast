@@ -232,7 +232,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 mxArray* msgVectorToMatlab(std::vector<message> msgs_)
 {
-	const char* fieldNames[] = { "text", "timeStamp" };
+	const char* fieldNames[] = { "text", "timeStamp", "ip" };
 	mxArray* out = mxCreateStructMatrix(1, msgs_.size(), sizeof(fieldNames) / sizeof(*fieldNames), fieldNames);
 	size_t i = 0;
 	for (auto &msg : msgs_)
@@ -241,6 +241,7 @@ mxArray* msgVectorToMatlab(std::vector<message> msgs_)
 		mxArray *temp;
 		mxSetFieldByNumber(out, i, 1, temp = mxCreateNumericMatrix(1, 1, mxINT64_CLASS, mxREAL));
 		*static_cast<long long*>(mxGetData(temp)) = msg.timeStamp;
+		mxSetFieldByNumber(out, i, 2, mxCreateString(msg.ip));
 		i++;
 	}
 	return out;

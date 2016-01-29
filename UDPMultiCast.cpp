@@ -74,18 +74,11 @@ void UDPMultiCast::init()
 
 	// create receive buffer and post a bunch of receives
 	DWORD receiveBuffersAllocated;
-	_pReceiveBuffers = AllocateBufferSpace(_bufferSize, _IOCPPendingReceives, receiveBuffersAllocated);
-
-	DWORD offset = 0;
-
-	const DWORD recvFlags = 0;
-
+	_pReceiveBuffers = reinterpret_cast<char *>(AllocateBufferSpace(_bufferSize, _IOCPPendingReceives, receiveBuffersAllocated));
+	_pAddrBuffers    = reinterpret_cast<sockaddr_in *>(AllocateBufferSpace(sizeof(sockaddr_in), _IOCPPendingReceives, receiveBuffersAllocated));
 	_pExtOverlappedArray = new EXTENDED_OVERLAPPED[receiveBuffersAllocated];
 
-	DWORD bytesRecvd = 0;
-	DWORD flags = 0;
-
-	for (DWORD i = 0; i < receiveBuffersAllocated; ++i)
+	for (DWORD i = 0, offset = 0; i < receiveBuffersAllocated; ++i, offset += static_cast<DWORD>(_bufferSize))
 	{
 		EXTENDED_OVERLAPPED *pExtOverlapped = _pExtOverlappedArray + i;
 
@@ -94,9 +87,8 @@ void UDPMultiCast::init()
 		pExtOverlapped->buf.buf = _pReceiveBuffers + offset;
 		pExtOverlapped->buf.len = static_cast<ULONG>(_bufferSize);	// lets assume the buffer size does not exceed 32bit limits
 		pExtOverlapped->isRead = TRUE;
-		pExtOverlapped->addrLen = sizeof(pExtOverlapped->addr);
-
-		offset += static_cast<DWORD>(_bufferSize);	// lets assume the buffer size does not exceed 32bit limits
+		pExtOverlapped->addr = _pAddrBuffers + i;
+		pExtOverlapped->addrLen = sizeof(sockaddr_in);
 
 		// queue up receive request
 		receive(pExtOverlapped);
@@ -211,7 +203,7 @@ void UDPMultiCast::receive(EXTENDED_OVERLAPPED* pExtOverlapped_, OVERLAPPED* pOv
 	{
 		pOverlapped = static_cast<OVERLAPPED *>(pExtOverlapped_);
 	}
-	if (SOCKET_ERROR == ::WSARecvFrom(_socket, &(pExtOverlapped_->buf), 1, &bytesRecvd, &flags, &(pExtOverlapped_->addr), &(pExtOverlapped_->addrLen), pOverlapped, 0))
+	if (SOCKET_ERROR == ::WSARecvFrom(_socket, &(pExtOverlapped_->buf), 1, &bytesRecvd, &flags, (sockaddr*) pExtOverlapped_->addr, &(pExtOverlapped_->addrLen), pOverlapped, 0))
 	{
 		const DWORD lastError = ::GetLastError();
 
@@ -418,37 +410,31 @@ unsigned int UDPMultiCast::threadFunction()
 
 			if (pExtOverlapped->isRead)
 			{
-				char addr[INET_ADDRSTRLEN];
-				inet_ntop(AF_INET, &(reinterpret_cast<sockaddr_in *>(&(pExtOverlapped->addr))->sin_addr), addr, INET_ADDRSTRLEN);
+				message received;
+				received.timeStamp = getTimeStamp();
+				inet_ntop(AF_INET, &(reinterpret_cast<sockaddr_in *>(pExtOverlapped->addr)->sin_addr), received.ip, INET_ADDRSTRLEN);
+				// parse message, store it, and see what to do with it
+				size_t headerLen, msgLen;
+				auto action = processMsg(pExtOverlapped->buf.buf, &headerLen, &msgLen);
+				received.text = msgLen >= headerLen ? _strdup(pExtOverlapped->buf.buf + headerLen) : new char{ '\0' }; // make sure always valid (if possibly empty) string
 				//cout << "read data: \"" << pExtOverlapped->buf.buf << "\" from " << addr << endl;
 
-				// adds to output queue and indicates any action to take
-				size_t headerLen, msgLen;
-				switch (processMsg(pExtOverlapped->buf.buf, &headerLen, &msgLen))
+				// adds to output queue or takes indicated action 
+				switch (action)
 				{
-				case  MsgAction::noAction:
+				case MsgAction::noAction:
 					// nothing to do
 					break;
 				case MsgAction::exit:
 					// exit msg received, post exit msg to other threads and exit
 					PostQueuedCompletionStatus(_hIOCP, 0, 0, 0);
 					break;
-				case  MsgAction::storeData:
-				{
-					message received;
-					received.text = msgLen >= headerLen ? _strdup(pExtOverlapped->buf.buf + headerLen) : new char{ '\0' };
-					received.timeStamp = timeStamp;
+				case MsgAction::storeData:
 					_receivedData.enqueue(received);
 					break;
-				}
-				case  MsgAction::storeCommand:
-				{
-					message received;
-					received.text = msgLen >= headerLen ? _strdup(pExtOverlapped->buf.buf + headerLen) : new char{ '\0' };
-					received.timeStamp = timeStamp;
+				case MsgAction::storeCommand:
 					_receivedCommands.enqueue(received);
 					break;
-				}
 				}
 
 				// queue up new receive request. Note that a completion packet will be queued up even if this returns immediately
@@ -461,6 +447,7 @@ unsigned int UDPMultiCast::threadFunction()
 				//Send();	// just keep sending same message for now
 
 				delete[] pExtOverlapped->buf.buf;
+				// addr field not used for sends, nothing to delete
 				delete pExtOverlapped;
 			}
 		}
