@@ -23,7 +23,7 @@ UDPMultiCast::~UDPMultiCast()
 
 void UDPMultiCast::init()
 {
-	// improve thread precision:
+	// TODO (optionally, default on): improve thread precision:
 	//http://stackoverflow.com/questions/3744032/why-are-net-timers-limited-to-15-ms-resolution/22862989#22862989
 
 	// InitialiseWinsock
@@ -58,6 +58,9 @@ void UDPMultiCast::init()
 	// setup multicasting: set loopback
 	setupLoopBack(_loopBack);
 
+	// multicast note: can use IP_BLOCK_SOURCE and IP_UNBLOCK_SOURCE to control what messages we receive.
+	// Though separate groups is a better idea if we want multiple smaller groups
+
 	// setup IOCP port and associate socket handle
 	_hIOCP = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
 	if (0 == _hIOCP)
@@ -68,9 +71,6 @@ void UDPMultiCast::init()
 	{
 		ErrorExit("CreateIoCompletionPort");
 	}
-
-	// note: can use IP_BLOCK_SOURCE and IP_UNBLOCK_SOURCE to control what messages we receive.
-	// Though perhaps separate groups is a better idea if we want multiple smaller groups
 
 	// create receive buffer and post a bunch of receives
 	DWORD receiveBuffersAllocated;
@@ -139,11 +139,11 @@ void UDPMultiCast::deInit()
 	// release socket
 	if (SOCKET_ERROR == ::shutdown(_socket,2))
 	{
-		ErrorExit("bind");
+		ErrorExit("shutdown");
 	}
 	if (SOCKET_ERROR == ::closesocket(_socket))
 	{
-		ErrorExit("bind");
+		ErrorExit("closesocket");
 	}
 	// cleanup WinSocks
 	WSACleanup();
@@ -189,7 +189,7 @@ void UDPMultiCast::sendInternal(EXTENDED_OVERLAPPED * sendOverlapped_)
 
 		if (lastError != ERROR_IO_PENDING)
 		{
-			ErrorExit("WSASendTo", lastError);
+			ErrorExit("WSASendTo", __LINE__, lastError);
 		}
 	}
 }
@@ -230,7 +230,7 @@ void UDPMultiCast::setLoopBack(const BOOL& loopBack_)
 
 void UDPMultiCast::setGroupAddress(const std::string& groupAddress_)
 {
-	// join old group, if any
+	// leave old group, if any
 	leaveMultiCast();
 	// set new group address and join
 	_groupAddress = groupAddress_;
@@ -405,7 +405,6 @@ unsigned int UDPMultiCast::threadFunction()
 		{
 			// received or sent data
 			EXTENDED_OVERLAPPED *pExtOverlapped = static_cast<EXTENDED_OVERLAPPED *>(pOverlapped);
-			auto timeStamp = getTimeStamp();
 
 			if (pExtOverlapped->isRead)
 			{
@@ -464,7 +463,7 @@ MsgAction UDPMultiCast::processMsg(const char * msg_, size_t *len_, size_t *msgL
 	else
 		*len_ = commaPos - msg_ + 1;
 	char *id = new char[*len_] {0};	// as includes comma, we've got a null terminator
-	memcpy(id, msg_, *len_ - 1);	// -1 is safe as we're point to 1 at minimum
+	memcpy(id, msg_, *len_ - 1);	// -1 is safe as we're pointing to idx 1 at minimum
 
 	// switchyard using consexpr str2int to hash switch values to integrals
 	switch (str2int(id))

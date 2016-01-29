@@ -21,9 +21,7 @@ public:
 	int  checkReceiverThreads();
 
 	// get the data and command messages received since the last call to this function
-	// right now these are distinguished by putting dat or cmd in front of each message
-	// in the final version, we'd have data coming in over UDP and commands over TCP, that
-	// would be how they're distinguished.
+	// these are distinguished by putting dat or cmd in front of each message
 	std::vector<message> getData();
 	std::vector<message> getCommands();
 
@@ -34,7 +32,7 @@ public:
 	void setLoopBack(const BOOL& loopBack_);
 	std::string getGroupAddress() const { return _groupAddress; }
 	void setGroupAddress(const std::string& groupAddress_);
-	// these can only be called before init is called
+	// for these, the setters can only be called before init is called
 	unsigned short getPort() const { return _port; }
 	void setPort(const unsigned short& port_);
 	size_t getBufferSize() const { return _bufferSize; }
