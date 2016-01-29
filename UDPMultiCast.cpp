@@ -271,13 +271,14 @@ void UDPMultiCast::setNumReceiverThreads(const unsigned long & numIOCPThreads_)
 	_numIOCPThreads = numIOCPThreads_;
 }
 
-std::vector<message> UDPMultiCast::getData()
+template<size_t buffer_size>
+inline std::vector<message> getMsgs(queue_t<buffer_size>& msgBuffer_)
 {
 	std::vector<message> dataMsgs;
 	while (true)
 	{
 		message temp;
-		bool success = _receivedData.dequeue(temp);
+		bool success = msgBuffer_.dequeue(temp);
 		if (success)
 			dataMsgs.push_back(std::move(temp));
 		else
@@ -286,19 +287,14 @@ std::vector<message> UDPMultiCast::getData()
 	return dataMsgs;
 }
 
+std::vector<message> UDPMultiCast::getData()
+{
+	return getMsgs(_receivedData);
+}
+
 std::vector<message> UDPMultiCast::getCommands()
 {
-	std::vector<message> commandMsgs;
-	while (true)
-	{
-		message temp;
-		bool success = _receivedCommands.dequeue(temp);
-		if (success)
-			commandMsgs.push_back(std::move(temp));
-		else
-			break;
-	}
-	return commandMsgs;
+	return getMsgs(_receivedCommands);
 }
 
 void UDPMultiCast::stopIOCP()
