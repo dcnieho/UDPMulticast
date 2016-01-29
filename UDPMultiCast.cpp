@@ -332,13 +332,16 @@ void UDPMultiCast::waitIOCPThreadsStop()
 int UDPMultiCast::checkReceiverThreads()
 {
 	// Check if threads still active
-	for (auto it = _threads.begin(); it != _threads.end(); ++it)
+	auto it = _threads.begin();
+	while (it != _threads.end())
 	{
 		if (WAIT_OBJECT_0 == ::WaitForSingleObject(*it, 0))
 		{
 			::CloseHandle(*it);
 			it = _threads.erase(it);
 		}
+		else
+			++it;
 	}
 
 	if (_threads.empty() && _haveCriticalSection)
