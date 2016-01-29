@@ -82,11 +82,17 @@ inline void ErrorExit(
 }
 
 inline void ErrorExit(
-	const char *pFunction)
+	const char *pFunction, const int lineNumber)
 {
 	const DWORD lastError = ::GetLastError();
 
-	ErrorExit(pFunction, 0, lastError);
+	ErrorExit(pFunction, lineNumber, lastError);
+}
+
+inline void ErrorExit(
+	const char *pFunction)
+{
+	ErrorExit(pFunction, 0);
 }
 
 inline void ErrorMsgExit(
@@ -96,14 +102,6 @@ inline void ErrorMsgExit(
 	os << pMsg_ << std::endl;
 
 	DoExitWithMsg(os.str());
-}
-
-inline void ErrorExit(
-	const char *pFunction, const int lineNumber)
-{
-	const DWORD lastError = ::GetLastError();
-
-	ErrorExit(pFunction, lineNumber, lastError);
 }
 
 template <typename TV, typename TM>
