@@ -44,7 +44,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -73,8 +73,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetExt>.pyd</TargetExt>
-    <TargetName>UDPClient_python</TargetName>
+    <TargetName>UDPClient_python_d</TargetName>
     <OutDir>.\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>.\</OutDir>
+    <TargetName>UDPClient_python</TargetName>
+    <TargetExt>.pyd</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -94,12 +99,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\dat\C\boost;C:\Users\Diederick\Anaconda\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\dat\C\Dependency\boost;C:\Users\Diederick\Anaconda2\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\Diederick\Anaconda\libs;C:\dat\C\boost\lib\$(Platform)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\Diederick\Anaconda2\libs;C:\dat\C\Dependency\boost\stage\$(Platform)\lib</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
       <AdditionalDependencies>..\$(IntDir)UDPClient.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -125,11 +130,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\dat\C\Dependency\boost;C:\Users\Diederick\Anaconda2\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>C:\Users\Diederick\Anaconda2\libs;C:\dat\C\Dependency\boost\stage\$(Platform)\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>..\$(IntDir)UDPClient.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
