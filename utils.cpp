@@ -1,26 +1,38 @@
 #include "utils.h"
 
 
+static bool gtsInitialized = false;
+static bool win8OrGreater = false;
+typedef WINBASEAPI VOID (WINAPI *GETPRECISETIMEFUN)(_Out_ LPFILETIME);
+static GETPRECISETIMEFUN GetPreciseTime = nullptr;
+
 int64_t getTimeStamp()	// signed so we don't get in trouble if user does calculations with output that yield negative numbers
 {
 	// alternatively could pull out the big gun and use windows timestamp project
 	// think what is below is good enough though...
 
-	static bool initialized;
-	static bool win8OrGreater;
-	if (!initialized)
+	if (!gtsInitialized)
 	{
 		win8OrGreater = IsWindows8OrGreater();
+		if (win8OrGreater)
+		{
+			HMODULE hMod = LoadLibrary("kernel32.dll");
+			GetPreciseTime = (GETPRECISETIMEFUN)GetProcAddress(hMod, "GetSystemTimePreciseAsFileTime");
+		}
+
+		// done with init
+		gtsInitialized = true;
 	}
 
 	if (win8OrGreater)
 	{
 		FILETIME ft;
-		GetSystemTimePreciseAsFileTime(&ft);
+		(*GetPreciseTime)(&ft);	// GetSystemTimePreciseAsFileTime
 
 		// Windows file times are in 100s of nanoseconds.
 		// Convert to microseconds by dividing by 10.
 
+		// Then convert to Unix epoch:
 		// Between January 1, 1601 and January 1, 1970, there were 369 complete years,
 		// of which 89 were leap years (1700, 1800, and 1900 were not leap years).
 		// That is a total of 134774 days, which is 11644473600 seconds.
@@ -45,8 +57,9 @@ int64_t getTimeStamp()	// signed so we don't get in trouble if user does calcula
 
 			FILETIME ftOld, ftInitial;
 
-			// spin until low resolution clock ticks, then we have a value high resolution counter as close as possible to 
-			// this tick without more complicated calibration routines
+			// spin until low resolution clock ticks, then we have a value for the
+			// high resolution counter as close as possible to this tick without
+			// more complicated calibration routines
 			GetSystemTimeAsFileTime(&ftOld);
 			do
 			{
@@ -85,7 +98,7 @@ int64_t getTimeStamp()	// signed so we don't get in trouble if user does calcula
 		uSystemTime.HighPart = ft.dwHighDateTime;
 		if (uCurrentTime.QuadPart < uSystemTime.QuadPart || uCurrentTime.QuadPart - uSystemTime.QuadPart > 1000000)
 		{
-			uFrequency.QuadPart = 0;
+			uFrequency.QuadPart = 0;	// we'll init again on next run
 			uCurrentTime = uSystemTime;
 		}
 
