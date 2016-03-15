@@ -15,3 +15,6 @@ ipch
 *.lib
 *.pdb
 git_refid.h
+*.VC.db
+*.iobj
+*.ipdb
