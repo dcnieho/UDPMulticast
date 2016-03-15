@@ -16,7 +16,7 @@ int64_t getTimeStamp()	// signed so we don't get in trouble if user does calcula
 		win8OrGreater = IsWindows8OrGreater();
 		if (win8OrGreater)
 		{
-			HMODULE hMod = LoadLibrary("kernel32.dll");
+			HMODULE hMod = GetModuleHandle("kernel32");
 			GetPreciseTime = (GETPRECISETIMEFUN)GetProcAddress(hMod, "GetSystemTimePreciseAsFileTime");
 		}
 
