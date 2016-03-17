@@ -157,4 +157,7 @@ inline LPVOID AllocateBufferSpace(
     return pBuffer;
 }
 
+// time stamp provider. Must call initTimeStamping before first use
+// if WTP==true, try and use Windows Timestamp Project code, else use Windows native calls
+void initTimeStamping(bool WTP = true);
 int64_t getTimeStamp();	// signed so we don't get in trouble if user does calculations with output that yield negative numbers

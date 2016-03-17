@@ -1,4 +1,5 @@
 #include "../UDPMultiCast.h"
+#define DLL_EXPORT_SYM __declspec(dllexport) 
 #include "mex.h"
 #include "class_handle.hpp"
 #include "../str2int.h"
@@ -7,7 +8,7 @@
 
 mxArray* msgVectorToMatlab(std::vector<message> msgs_);
 
-void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
+void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
     // Get the command string
     char cmd[64];
@@ -124,6 +125,22 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         // Call the method
         plhs[0] = mxCreateLogicalScalar(!!UDPinstance->getLoopBack());
         return;
+    case str2int("setUseWTP"):
+    {
+        // Check parameters
+        if (nlhs < 0 || nrhs < 3)
+            mexErrMsgTxt("setUseWTP: Expected loopback input.");
+        if (!(mxIsDouble(prhs[2]) && !mxIsComplex(prhs[2]) && mxIsScalar(prhs[2])) && !mxIsLogicalScalar(prhs[2]))
+            mexErrMsgTxt("setUseWTP: Expected argument to be a logical scalar.");
+        bool useWTP;
+        if (mxIsDouble(prhs[2]))
+            useWTP = !!mxGetScalar(prhs[2]);
+        else
+            useWTP = mxIsLogicalScalarTrue(prhs[2]);
+        // Call the method
+        UDPinstance->setUseWTP(useWTP);
+        return;
+    }
     case str2int("setLoopBack"):
     {
         // Check parameters

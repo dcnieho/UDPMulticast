@@ -28,6 +28,7 @@ public:
     // getters and setters
     // these can be called at any time
     std::string getGitRefID() const;	// implemented in cpp as frequent changes would trigger frequent complete recompiles...
+    void setUseWTP(bool useWTP_);
     BOOL getLoopBack() const { return _loopBack; }
     void setLoopBack(const BOOL& loopBack_);
     std::string getGroupAddress() const { return _groupAddress; }
@@ -76,6 +77,7 @@ private:
     queue_t<128>  _receivedCommands;
 
     // params and user prefs, with defaults
+    bool _useWTP = false;
     DWORD _spinCount = 4000;
     // these can be set
     size_t _bufferSize = 4096;

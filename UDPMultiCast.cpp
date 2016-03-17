@@ -219,6 +219,14 @@ std::string UDPMultiCast::getGitRefID() const
     return GIT_REFID;
 }
 
+void UDPMultiCast::setUseWTP(bool useWTP_)
+{
+    if (_initialized)
+        ErrorMsgExit("cannot set usage of WTP timestamping when already initialized");
+
+    _useWTP = useWTP_;
+}
+
 void UDPMultiCast::setLoopBack(const BOOL& loopBack_)
 {
     if (_initialized)

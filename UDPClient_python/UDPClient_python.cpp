@@ -43,6 +43,7 @@ BOOST_PYTHON_MODULE(UDPClient_python)
 
         // getters and setters
         // these can be called at any time
+        .def("setUseWTP", &UDPMultiCast::setUseWTP)
         .add_property("loopBack", &UDPMultiCast::getLoopBack, &UDPMultiCast::setLoopBack)
         .add_property("groupAddress", &UDPMultiCast::getGroupAddress, &UDPMultiCast::setGroupAddress)
         // these can only be called before init is called

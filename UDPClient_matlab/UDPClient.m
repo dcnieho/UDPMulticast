@@ -45,6 +45,9 @@ classdef UDPClient < handle
         end
         
         % getters and setters
+        function setUseWTP(this, varargin)
+            UDPClient_matlab('setUseWTP', this.objectHandle, varargin{:});
+        end
         function loopback = getLoopBack(this)
             loopback = UDPClient_matlab('getLoopBack', this.objectHandle);
         end
