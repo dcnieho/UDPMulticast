@@ -10,7 +10,7 @@ udp.setLoopBack(true);
 
 % send a bunch of messages
 for i=1:2048
-    udp.sendWithTimeStamp('dat,1,crap',',');
+    udp.sendWithTimeStamp('dat,1,crap',';');
 end
 dataMsgs = udp.getData;
 for i=1:20
