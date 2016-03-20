@@ -4,6 +4,7 @@ udp = UDPClient();
 udp.setPort(4444);
 udp.getGroupAddress()
 udp.setUseWTP(true);
+udp.setMaxClockRes(true);
 udp.init();
 udp.setLoopBack(true);
 

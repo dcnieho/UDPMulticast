@@ -29,6 +29,7 @@ public:
     // these can be called at any time
     std::string getGitRefID() const;	// implemented in cpp as frequent changes would trigger frequent complete recompiles...
     void setUseWTP(bool useWTP_);
+    void setMaxClockRes(bool setMaxClockRes_);
     BOOL getLoopBack() const { return _loopBack; }
     void setLoopBack(const BOOL& loopBack_);
     std::string getGroupAddress() const { return _groupAddress; }
@@ -78,6 +79,7 @@ private:
 
     // params and user prefs, with defaults
     bool _useWTP = false;
+    bool _setMaxClockRes = false;
     DWORD _spinCount = 4000;
     // these can be set
     size_t _bufferSize = 4096;

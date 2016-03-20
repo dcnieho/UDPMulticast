@@ -48,6 +48,9 @@ classdef UDPClient < handle
         function setUseWTP(this, varargin)
             UDPClient_matlab('setUseWTP', this.objectHandle, varargin{:});
         end
+        function setMaxClockRes(this, varargin)
+            UDPClient_matlab('setMaxClockRes', this.objectHandle, varargin{:});
+        end
         function loopback = getLoopBack(this)
             loopback = UDPClient_matlab('getLoopBack', this.objectHandle);
         end

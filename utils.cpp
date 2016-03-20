@@ -52,61 +52,68 @@ namespace {
 
     typedef int64_t (*fpGetTimeStamp) (void);
     fpGetTimeStamp getTimeFun = nullptr;
+
+    void setMaxClockResolution()
+    {
+        // set system timer to highest resolution possible
+        HINSTANCE hLibrary = LoadLibrary("NTDLL.dll");
+        typedef HRESULT(NTAPI* pSetTimerResolution)(ULONG RequestedResolution, BOOLEAN Set, PULONG ActualResolution);
+        typedef HRESULT(NTAPI* pQueryTimerResolution)(PULONG MinimumResolution, PULONG MaximumResolution, PULONG CurrentResolution);
+
+        ULONG minResolution, maxResolution, actualResolution;
+        ((pQueryTimerResolution)GetProcAddress(hLibrary, "NtQueryTimerResolution"))(&minResolution, &maxResolution, &actualResolution);
+        ((pSetTimerResolution)GetProcAddress(hLibrary, "NtSetTimerResolution"))(maxResolution, TRUE, &actualResolution);
+        fprintf(stdout, "system timer set to resolution: %d\n", actualResolution);
+    }
 }
 
 
-// if WTP==true, try and use Windows Timestamp Project code, else use Windows native calls
-void initTimeStamping(bool WTP /*= true*/)
-{
-    if (WTP)
+namespace timeUtils {
+    // if WTP==true, try and use Windows Timestamp Project code, else use Windows native calls
+    void initTimeStamping(bool setMaxClockRes /*= true*/, bool WTP /*= true*/)
     {
-        TimeStamp_TYPE TimeStamp;
-        // check the state of G_Kernel.exe without even initializing the pipe services :
-        GetTimeStamp(&TimeStamp);
-        while (TimeStamp.State < TIME_STAMP_CALIBRATED) {
-            // G_Kernel time service is not calibrated
-            switch (TimeStamp.State) {
-            case TIME_STAMP_OFFLINE:
-                fprintf(stdout, "G_Kernel.exe is not running, please start G_Kernel.exe\n");
-                break;
-            case TIME_STAMP_AWAITING_CALIBRATION:
-                fprintf(stdout, "G_Kernel.exe has not yet established calibration, please wait...\n");
-                break;
-            }
-            Sleep(1000);
-            GetTimeStamp(&TimeStamp);
-        }
-        if (TimeStamp.State == TIME_STAMP_LICENSE_EXPIRED) fprintf(stdout, "License expired for G_Kernel.exe, continuing at default accuracy...\n");
-        else fprintf(stdout, "G_Kernel.exe has established calibration, continuing...\n");
+        if (setMaxClockRes)
+            setMaxClockResolution();
 
-        // done, assign function pointer
-        getTimeFun = &getTimeStampWTP;
-    }
-    else
-    {
-        if (IsWindows8OrGreater())
+        if (WTP)
         {
-            getTimeFun = &getTimeStampGetSystemTimePreciseAsFileTime;
-            HMODULE hMod = GetModuleHandle("kernel32");
-            GetPreciseTime = (fpGetSystemTimePreciseAsFileTime)GetProcAddress(hMod, "GetSystemTimePreciseAsFileTime");
+            TimeStamp_TYPE TimeStamp;
+            // check the state of G_Kernel.exe without even initializing the pipe services :
+            ::GetTimeStamp(&TimeStamp);
+            while (TimeStamp.State < TIME_STAMP_CALIBRATED) {
+                // G_Kernel time service is not calibrated
+                switch (TimeStamp.State) {
+                case TIME_STAMP_OFFLINE:
+                    fprintf(stdout, "G_Kernel.exe is not running, please start G_Kernel.exe\n");
+                    break;
+                case TIME_STAMP_AWAITING_CALIBRATION:
+                    fprintf(stdout, "G_Kernel.exe has not yet established calibration, please wait...\n");
+                    break;
+                }
+                Sleep(1000);
+                GetTimeStamp(&TimeStamp);
+            }
+            if (TimeStamp.State == TIME_STAMP_LICENSE_EXPIRED) fprintf(stdout, "License expired for G_Kernel.exe, continuing at default accuracy...\n");
+            else fprintf(stdout, "G_Kernel.exe has established calibration, continuing...\n");
+
+            // done, assign function pointer
+            getTimeFun = &getTimeStampWTP;
         }
         else
         {
-            getTimeFun = &getTimeStampGetSystemTimeAsFileTime;
-            // set system timer to highest resolution possible
-            HINSTANCE hLibrary = LoadLibrary("NTDLL.dll");
-            typedef HRESULT(NTAPI* pSetTimerResolution)(ULONG RequestedResolution, BOOLEAN Set, PULONG ActualResolution);
-            typedef HRESULT(NTAPI* pQueryTimerResolution)(PULONG MinimumResolution, PULONG MaximumResolution, PULONG CurrentResolution);
-
-            ULONG minResolution, maxResolution, actualResolution;
-            ((pQueryTimerResolution)GetProcAddress(hLibrary, "NtQueryTimerResolution"))(&minResolution, &maxResolution, &actualResolution);
-            ((pSetTimerResolution)GetProcAddress(hLibrary, "NtSetTimerResolution"))(maxResolution, TRUE, &actualResolution);
-            fprintf(stdout, "system timer set to resolution: %d\n", actualResolution);
+            if (IsWindows8OrGreater())
+            {
+                getTimeFun = &getTimeStampGetSystemTimePreciseAsFileTime;
+                HMODULE hMod = GetModuleHandle("kernel32");
+                GetPreciseTime = (fpGetSystemTimePreciseAsFileTime)GetProcAddress(hMod, "GetSystemTimePreciseAsFileTime");
+            }
+            else
+                getTimeFun = &getTimeStampGetSystemTimeAsFileTime;
         }
     }
-}
 
-int64_t getTimeStamp()	// signed so we don't get in trouble if user does calculations with output that yield negative numbers
-{
-    return getTimeFun();
+    int64_t getTimeStamp()	// signed so we don't get in trouble if user does calculations with output that yield negative numbers
+    {
+        return getTimeFun();
+    }
 }

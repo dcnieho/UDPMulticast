@@ -141,6 +141,22 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         UDPinstance->setUseWTP(useWTP);
         return;
     }
+    case str2int("setMaxClockRes"):
+    {
+        // Check parameters
+        if (nlhs < 0 || nrhs < 3)
+            mexErrMsgTxt("setMaxClockRes: Expected loopback input.");
+        if (!(mxIsDouble(prhs[2]) && !mxIsComplex(prhs[2]) && mxIsScalar(prhs[2])) && !mxIsLogicalScalar(prhs[2]))
+            mexErrMsgTxt("setMaxClockRes: Expected argument to be a logical scalar.");
+        bool setMaxClockRes;
+        if (mxIsDouble(prhs[2]))
+            setMaxClockRes = !!mxGetScalar(prhs[2]);
+        else
+            setMaxClockRes = mxIsLogicalScalarTrue(prhs[2]);
+        // Call the method
+        UDPinstance->setMaxClockRes(setMaxClockRes);
+        return;
+    }
     case str2int("setLoopBack"):
     {
         // Check parameters

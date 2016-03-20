@@ -23,8 +23,8 @@ UDPMultiCast::~UDPMultiCast()
 
 void UDPMultiCast::init()
 {
-    // TODO (optionally, default on): improve thread precision:
-    //http://stackoverflow.com/questions/3744032/why-are-net-timers-limited-to-15-ms-resolution/22862989#22862989
+    // initialize timestamp provider
+    timeUtils::initTimeStamping(_setMaxClockRes,_useWTP);
 
     // InitialiseWinsock
     WSADATA data;
@@ -116,9 +116,6 @@ void UDPMultiCast::init()
 
     std::cout << _numIOCPThreads << " threads running" << std::endl;
 
-    // initialize timestamp provider
-    initTimeStamping(false);
-
     // done
     _initialized = true;
 }
@@ -157,7 +154,7 @@ void UDPMultiCast::deInit()
 
 void UDPMultiCast::sendWithTimeStamp(const std::string msg_, const char delim_/* = ','*/)
 {
-    send(msg_ + delim_ + std::to_string(getTimeStamp()));
+    send(msg_ + delim_ + std::to_string(timeUtils::getTimeStamp()));
 }
 
 void UDPMultiCast::send(const std::string msg_)
@@ -225,6 +222,14 @@ void UDPMultiCast::setUseWTP(bool useWTP_)
         ErrorMsgExit("cannot set usage of WTP timestamping when already initialized");
 
     _useWTP = useWTP_;
+}
+
+void UDPMultiCast::setMaxClockRes(bool setMaxClockRes_)
+{
+    if (_initialized)
+        ErrorMsgExit("cannot set maximum clock resolution when already initialized");
+
+    _setMaxClockRes = setMaxClockRes_;
 }
 
 void UDPMultiCast::setLoopBack(const BOOL& loopBack_)
@@ -417,7 +422,7 @@ unsigned int UDPMultiCast::threadFunction()
             if (pExtOverlapped->isRead)
             {
                 message received;
-                received.timeStamp = getTimeStamp();
+                received.timeStamp = timeUtils::getTimeStamp();
                 inet_ntop(AF_INET, &(reinterpret_cast<sockaddr_in *>(pExtOverlapped->addr)->sin_addr), received.ip, INET_ADDRSTRLEN);
                 // parse message, store it, and see what to do with it
                 size_t headerLen, msgLen;
