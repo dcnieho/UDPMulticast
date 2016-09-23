@@ -2,6 +2,7 @@
 
 #include <string>
 #include <iostream>
+#include "../strHash.h"
 
 int _tmain(int argc, _TCHAR* argv[])
 {

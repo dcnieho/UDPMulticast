@@ -1,6 +1,6 @@
 #pragma once
 #include "includes.h"
-#include "str2int.h"
+#include "strHash.h"
 
 #include <string>
 #include <sstream>

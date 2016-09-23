@@ -2,18 +2,20 @@
 #define DLL_EXPORT_SYM __declspec(dllexport) 
 #include "mex.h"
 #include "class_handle.hpp"
-#include "../str2int.h"
+#include "../strHash.h"
 
 #include <cwchar>
+#include <algorithm>
 
 mxArray* msgVectorToMatlab(std::vector<message> msgs_);
 
 void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-    // Get the command string
-    char cmd[64];
+	// Get the command string
+	char cmd[64] = {0};
     if (nrhs < 1 || mxGetString(prhs[0], cmd, sizeof(cmd)))
         mexErrMsgTxt("First input should be a command string less than 64 characters long.");
+	size_t nChar = std::min(strlen(cmd),size_t(64));
 
     // New
     if (!strcmp("new", cmd)) {
@@ -43,23 +45,23 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
     UDPMultiCast *UDPinstance = convertMat2Ptr<UDPMultiCast>(prhs[1]);
 
     // Call the various class methods
-    switch (str2int(cmd))
+    switch (rt::crc32(cmd,nChar))
     {
-    case str2int("init"):
+    case ct::crc32("init"):
         // Check parameters
         if (nlhs < 0 || nrhs < 2)
             mexErrMsgTxt("init: Unexpected arguments.");
         // Call the method
         UDPinstance->init();
         return;
-    case str2int("deInit"):
+    case ct::crc32("deInit"):
         // Check parameters
         if (nlhs < 0 || nrhs < 2)
             mexErrMsgTxt("deInit: Unexpected arguments.");
         // Call the method
         UDPinstance->deInit();
         return;
-    case str2int("sendWithTimeStamp"):
+    case ct::crc32("sendWithTimeStamp"):
     {
         // Check parameters
         if (nlhs < 0 || nrhs < 3)
@@ -84,7 +86,7 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         mxFree(str);
         return;
     }
-    case str2int("send"):
+    case ct::crc32("send"):
     {
         // Check parameters
         if (nlhs < 0 || nrhs < 3)
@@ -97,35 +99,35 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         mxFree(str);
         return;
     }
-    case str2int("checkReceiverThreads"):
+    case ct::crc32("checkReceiverThreads"):
         // Check parameters
         if (nlhs < 1 || nrhs < 2)
             mexErrMsgTxt("checkReceiverThreads: Unexpected arguments.");
         // Call the method
         plhs[0] = mxCreateDoubleScalar(UDPinstance->checkReceiverThreads());
         return;
-    case str2int("getData"):
+    case ct::crc32("getData"):
         // Check parameters
         if (nlhs < 1 || nrhs < 2)
             mexErrMsgTxt("getData: Unexpected arguments.");
         // Call the method
         plhs[0] = msgVectorToMatlab(UDPinstance->getData());
         return;
-    case str2int("getCommands"):
+    case ct::crc32("getCommands"):
         // Check parameters
         if (nlhs < 1 || nrhs < 2)
             mexErrMsgTxt("getCommands: Unexpected arguments.");
         // Call the method
         plhs[0] = msgVectorToMatlab(UDPinstance->getCommands());
         return;
-    case str2int("getLoopBack"):
+    case ct::crc32("getLoopBack"):
         // Check parameters
         if (nlhs < 1 || nrhs < 2)
             mexErrMsgTxt("getLoopBack: Unexpected arguments.");
         // Call the method
         plhs[0] = mxCreateLogicalScalar(!!UDPinstance->getLoopBack());
         return;
-    case str2int("setUseWTP"):
+    case ct::crc32("setUseWTP"):
     {
         // Check parameters
         if (nlhs < 0 || nrhs < 3)
@@ -141,7 +143,7 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         UDPinstance->setUseWTP(useWTP);
         return;
     }
-    case str2int("setMaxClockRes"):
+    case ct::crc32("setMaxClockRes"):
     {
         // Check parameters
         if (nlhs < 0 || nrhs < 3)
@@ -157,7 +159,7 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         UDPinstance->setMaxClockRes(setMaxClockRes);
         return;
     }
-    case str2int("setLoopBack"):
+    case ct::crc32("setLoopBack"):
     {
         // Check parameters
         if (nlhs < 0 || nrhs < 3)
@@ -173,14 +175,14 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         UDPinstance->setLoopBack(loopback);
         return;
     }
-    case str2int("getGroupAddress"):
+    case ct::crc32("getGroupAddress"):
         // Check parameters
         if (nlhs < 1 || nrhs < 2)
             mexErrMsgTxt("getGroupAddress: Unexpected arguments.");
         // Call the method
         plhs[0] = mxCreateString(UDPinstance->getGroupAddress().c_str());
         return;
-    case str2int("setGroupAddress"):
+    case ct::crc32("setGroupAddress"):
     {
         // Check parameters
         if (nlhs < 0 || nrhs < 3)
@@ -193,14 +195,14 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         mxFree(str);
         return;
     }
-    case str2int("getPort"):
+    case ct::crc32("getPort"):
         // Check parameters
         if (nlhs < 1 || nrhs < 2)
             mexErrMsgTxt("getPort: Unexpected arguments.");
         // Call the method
         plhs[0] = mxCreateDoubleScalar(UDPinstance->getPort());
         return;
-    case str2int("setPort"):
+    case ct::crc32("setPort"):
         // Check parameters
         if (nlhs < 0 || nrhs < 3)
             mexErrMsgTxt("setPort: Expected port input.");
@@ -209,14 +211,14 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         // Call the method
         UDPinstance->setPort(static_cast<unsigned short>(mxGetScalar(prhs[2])));
         return;
-    case str2int("getBufferSize"):
+    case ct::crc32("getBufferSize"):
         // Check parameters
         if (nlhs < 1 || nrhs < 2)
             mexErrMsgTxt("getBufferSize: Unexpected arguments.");
         // Call the method
         plhs[0] = mxCreateDoubleScalar(UDPinstance->getBufferSize());
         return;
-    case str2int("setBufferSize"):
+    case ct::crc32("setBufferSize"):
         // Check parameters
         if (nlhs < 0 || nrhs < 3)
             mexErrMsgTxt("setBufferSize: Expected buffer size input.");
@@ -225,14 +227,14 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         // Call the method
         UDPinstance->setBufferSize(static_cast<size_t>(mxGetScalar(prhs[2])));
         return;
-    case str2int("getNumQueuedReceives"):
+    case ct::crc32("getNumQueuedReceives"):
         // Check parameters
         if (nlhs < 1 || nrhs < 2)
             mexErrMsgTxt("getNumQueuedReceives: Unexpected arguments.");
         // Call the method
         plhs[0] = mxCreateDoubleScalar(UDPinstance->getNumQueuedReceives());
         return;
-    case str2int("setNumQueuedReceives"):
+    case ct::crc32("setNumQueuedReceives"):
         // Check parameters
         if (nlhs < 0 || nrhs < 3)
             mexErrMsgTxt("setNumQueuedReceives: Expected number of queued receives input.");
@@ -241,14 +243,14 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         // Call the method
         UDPinstance->setNumQueuedReceives(static_cast<unsigned long>(mxGetScalar(prhs[2])));
         return;
-    case str2int("getNumReceiverThreads"):
+    case ct::crc32("getNumReceiverThreads"):
         // Check parameters
         if (nlhs < 1 || nrhs < 2)
             mexErrMsgTxt("getNumReceiverThreads: Unexpected arguments.");
         // Call the method
         plhs[0] = mxCreateDoubleScalar(UDPinstance->getNumReceiverThreads());
         return;
-    case str2int("setNumReceiverThreads"):
+    case ct::crc32("setNumReceiverThreads"):
         // Check parameters
         if (nlhs < 0 || nrhs < 3)
             mexErrMsgTxt("setNumReceiverThreads: Expected number of receiver threads input.");

@@ -478,14 +478,16 @@ MsgAction UDPMultiCast::processMsg(const char * msg_, size_t *len_, size_t *msgL
     char *id = new char[*len_] {0};	// as includes comma, we've got a null terminator
     memcpy(id, msg_, *len_ - 1);	// -1 is safe as we're pointing to idx 1 at minimum
 
-    // switchyard using consexpr str2int to hash switch values to integrals
-    switch (str2int(id))
+    // switchyard using constexpr cheapCrappyHash to hash switch values to integrals
+	// cheapCrappyHash is crappy because many collisions are possible and long strings don't fit in the returned integer (overflow!).
+	// For the three different strings below, it works and it is cheap to compute
+    switch (cheapCrappyHash(id))
     {
-    case str2int("exit"):
+	case cheapCrappyHash("exit"):
         return MsgAction::exit;
-    case str2int("dat"):
+	case cheapCrappyHash("dat"):
         return MsgAction::storeData;
-    case str2int("cmd"):
+	case cheapCrappyHash("cmd"):
         return MsgAction::storeCommand;
     default:
         return MsgAction::noAction;
