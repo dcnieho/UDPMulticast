@@ -56,7 +56,7 @@ namespace {
     void setMaxClockResolution()
     {
         // set system timer to highest resolution possible
-        HINSTANCE hLibrary = LoadLibrary("NTDLL.dll");
+        HINSTANCE hLibrary = LoadLibrary(L"NTDLL.dll");
         typedef HRESULT(NTAPI* pSetTimerResolution)(ULONG RequestedResolution, BOOLEAN Set, PULONG ActualResolution);
         typedef HRESULT(NTAPI* pQueryTimerResolution)(PULONG MinimumResolution, PULONG MaximumResolution, PULONG CurrentResolution);
 
@@ -104,7 +104,7 @@ namespace timeUtils {
             if (IsWindows8OrGreater())
             {
                 getTimeFun = &getTimeStampGetSystemTimePreciseAsFileTime;
-                HMODULE hMod = GetModuleHandle("kernel32");
+                HMODULE hMod = GetModuleHandle(L"kernel32");
                 GetPreciseTime = (fpGetSystemTimePreciseAsFileTime)GetProcAddress(hMod, "GetSystemTimePreciseAsFileTime");
             }
             else
