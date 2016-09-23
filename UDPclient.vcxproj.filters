@@ -21,6 +21,9 @@
     <ClCompile Include="utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="strHash.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="utils.h">
@@ -38,10 +41,10 @@
     <ClInclude Include="mpmcBoundedQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="str2int.h">
+    <ClInclude Include="git_refid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="git_refid.h">
+    <ClInclude Include="strHash.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
