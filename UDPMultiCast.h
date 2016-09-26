@@ -74,8 +74,8 @@ private:
     char *_pReceiveBuffers;
     sockaddr_in *_pAddrBuffers;
     EXTENDED_OVERLAPPED *_pExtOverlappedArray;
-    queue_t<2048> _receivedData;
-    queue_t<128>  _receivedCommands;
+    queue_t<4096> _receivedData;
+    queue_t<512>  _receivedCommands;
 
     // params and user prefs, with defaults
     bool _useWTP = false;
