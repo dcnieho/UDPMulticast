@@ -43,6 +43,42 @@ classdef UDPClient < handle
         function cmds = getCommands(this)
             cmds = UDPClient_matlab('getCommands', this.objectHandle);
         end
+        % get data grouped by computer
+        function data = getDataGrouped(this,computers)
+            if nargin<2
+                computers = [];
+            end
+            rawData = this.getData();
+            data = {};
+            ips  = [];
+            for p=1:length(rawData)
+                ipPieces = sscanf(rawData(p).ip,'%d.%d.%d.%d');
+                ip = ipPieces(end);
+                % optionally, only process messages from specified
+                % computers
+                if ~isempty(computers) && ~any(ip==computers)
+                    continue
+                end
+                % find where in cell array to put 
+                qIp = ip==ips;
+                if ~any(qIp)
+                    ips(end+1)    = ip;
+                    data(end+1,:) = {ip,int64([]),[]};
+                    qIp           = ip==ips;
+                end
+                str   = rawData(p).text;
+                commas= find(str==',');
+                % moet los, anders krijg je doubles ookal zeg je %*f
+                % eerste de timestamps
+                str(commas(1):commas(end)-1) = '';
+                timestamps = sscanf(str,'%ld,%ld');
+                % dat de data
+                gazeData   = sscanf(rawData(p).text(commas(1)+1:commas(end)-1),'%f,%f,%f,%f');
+                % store
+                data{qIp,2}(end+1,:) = [timestamps.' rawData(p).timeStamp];   % SMI timestamp, send timestamp, receive timestamp
+                data{qIp,3}(end+1,:) = gazeData;  % leftX, leftY, rightX, rightY
+            end
+        end
         
         % getters and setters
         function setUseWTP(this, varargin)
