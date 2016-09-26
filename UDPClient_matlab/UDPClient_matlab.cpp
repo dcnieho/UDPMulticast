@@ -259,6 +259,14 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         // Call the method
         UDPinstance->setNumReceiverThreads(static_cast<unsigned long>(mxGetScalar(prhs[2])));
         return;
+#ifdef HAS_SMI_INTEGRATION
+	case ct::crc32("startSMIDataSender"):
+		UDPinstance->startSMIDataSender();
+		return;
+	case ct::crc32("removeSMIDataSender"):
+		UDPinstance->removeSMIDataSender();
+		return;
+#endif
     default:
         // Got here, so command not recognized
         mexErrMsgTxt("Command not recognized.");

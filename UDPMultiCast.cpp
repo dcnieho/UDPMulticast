@@ -126,6 +126,12 @@ void UDPMultiCast::deInit()
         // nothing to do
         return;
 
+	//
+#ifdef HAS_SMI_INTEGRATION
+	if (_smiDataSenderStarted)
+		removeSMIDataSender();
+#endif
+
     // leave multicast group
     leaveMultiCast();
 
@@ -533,3 +539,28 @@ void UDPMultiCast::leaveMultiCast()
     }
     _multiCastJoined = false;
 }
+
+#ifdef HAS_SMI_INTEGRATION
+namespace {
+	UDPMultiCast* classPtr = nullptr;
+}
+void UDPMultiCast::startSMIDataSender(bool needConnect /*= false*/)
+{
+	classPtr = this;
+	if (RET_SUCCESS != iV_SetSampleCallback(SMISampleCallback))
+		DoExitWithMsg("startSMIDataSender: iV_SetSampleCallback failed");
+	_smiDataSenderStarted = true;
+}
+void UDPMultiCast::removeSMIDataSender()
+{
+	iV_SetSampleCallback(nullptr);
+}
+
+int __stdcall SMISampleCallback(SampleStruct sampleData)
+{
+	char buf[128] = { '\0' };
+	sprintf_s(buf, "dat,%lld,%.2f,%.2f,%.2f,%.2f", sampleData.timestamp, sampleData.leftEye.gazeX, sampleData.leftEye.gazeY, sampleData.rightEye.gazeX, sampleData.rightEye.gazeY);
+	classPtr->sendWithTimeStamp(buf);
+	return 1;
+}
+#endif

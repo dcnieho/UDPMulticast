@@ -89,4 +89,19 @@ private:
     // more prefs, these can be changed after init
     std::string _groupAddress = "224.0.0.9";
     BOOL _loopBack = FALSE;
+
+	// SMI data read integration
+#ifdef HAS_SMI_INTEGRATION
+public:
+	void startSMIDataSender(bool needConnect = false);
+	void removeSMIDataSender();
+private:
+	bool _smiDataSenderStarted = false;
+#endif // DEBUG
+
 };
+// callback must be a free function
+#ifdef HAS_SMI_INTEGRATION
+#include "iViewXAPI.h"
+int __stdcall SMISampleCallback(SampleStruct sampleData);
+#endif // DEBUG

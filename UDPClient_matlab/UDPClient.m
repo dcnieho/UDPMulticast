@@ -87,5 +87,11 @@ classdef UDPClient < handle
         function setNumReceiverThreads(this, varargin)
             UDPClient_matlab('setNumReceiverThreads', this.objectHandle, varargin{:});
         end
+        function startSMIDataSender(this)
+            UDPClient_matlab('startSMIDataSender', this.objectHandle);
+        end
+        function removeSMIDataSender(this)
+            UDPClient_matlab('removeSMIDataSender', this.objectHandle);
+        end
     end
 end
