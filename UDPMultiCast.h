@@ -53,7 +53,7 @@ private:
     void waitIOCPThreadsStop();
     static unsigned int __stdcall startThreadFunction(void *pV);
     unsigned int threadFunction();
-    MsgAction processMsg(const char* msg_, size_t *len_, size_t *msgLen_);
+	MsgType processMsg(const char* msg_, size_t *headerLen_, size_t *msgLen_);
 
     // for executing option changes
     void setupLoopBack(const BOOL loopBack_);

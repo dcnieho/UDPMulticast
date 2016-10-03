@@ -39,10 +39,10 @@ struct message
 template <size_t buffer_size>
 using queue_t = mpmc_bounded_queue<message,buffer_size>;
 
-enum class MsgAction
+enum class MsgType
 {
-    noAction = 0,
+    unknown = 0,
     exit,
-    storeData,
-    storeCommand
+    data,
+    command
 };

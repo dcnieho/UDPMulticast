@@ -465,17 +465,17 @@ unsigned int UDPMultiCast::threadFunction()
                     // adds to output queue or takes indicated action 
                     switch (action)
                     {
-                    case MsgAction::noAction:
+                    case MsgType::unknown:
                         // nothing to do
                         break;
-                    case MsgAction::exit:
+                    case MsgType::exit:
                         // exit msg received, post exit msg to other threads and exit
                         PostQueuedCompletionStatus(_hIOCP, 0, 0, 0);
                         break;
-                    case MsgAction::storeData:
+                    case MsgType::data:
                         _receivedData.enqueue(received);
                         break;
-                    case MsgAction::storeCommand:
+                    case MsgType::command:
                         _receivedCommands.enqueue(received);
                         break;
                     }
@@ -500,30 +500,35 @@ unsigned int UDPMultiCast::threadFunction()
     return 0;
 }
 
-MsgAction UDPMultiCast::processMsg(const char * msg_, size_t *len_, size_t *msgLen_)
+MsgType UDPMultiCast::processMsg(const char *msg_, size_t *headerLen_, size_t *msgLen_)
 {
+    // does not modify msg_
+    // find where comma separating header from msg is
     auto commaPos = strchr(msg_, ',');
+    // see how long the whole input is
     *msgLen_ = strlen(msg_);
+    // get length of header
     if (!commaPos)
-        *len_ = *msgLen_ + 1; // pointing one past msg end to match below
+        *headerLen_ = *msgLen_ + 1; // pointing one past msg end to match below
     else
-        *len_ = commaPos - msg_ + 1;
-    char *id = new char[*len_] {0};	// as includes comma, we've got a null terminator
-    memcpy(id, msg_, *len_ - 1);	// -1 is safe as we're pointing to idx 1 at minimum
+        *headerLen_ = commaPos - msg_ + 1;
+    // take copy of header
+    char *header = new char[*headerLen_] {0};	// as headerLen_ includes comma, we've got space for null terminator
+    memcpy(header, msg_, *headerLen_ - 1);	// -1 is safe as we're pointing to idx 1 at minimum
 
     // switchyard using constexpr cheapCrappyHash to hash switch values to integrals
 	// cheapCrappyHash is crappy because many collisions are possible and long strings don't fit in the returned integer (overflow!).
 	// For the three different strings below, it works and it is cheap to compute
-    switch (cheapCrappyHash(id))
+    switch (cheapCrappyHash(header))
     {
 	case cheapCrappyHash("exit"):
-        return MsgAction::exit;
+        return MsgType::exit;
 	case cheapCrappyHash("dat"):
-        return MsgAction::storeData;
+        return MsgType::data;
 	case cheapCrappyHash("cmd"):
-        return MsgAction::storeCommand;
+        return MsgType::command;
     default:
-        return MsgAction::noAction;
+        return MsgType::unknown;
     }
 }
 
