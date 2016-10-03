@@ -3,6 +3,7 @@
 classdef UDPClient < handle
     properties (SetAccess = private, Hidden = true)
         objectHandle; % Handle to the underlying C++ class instance
+        computerFilter = [];
     end
     methods
         %% Constructor - Create a new C++ class instance 
@@ -46,7 +47,7 @@ classdef UDPClient < handle
         % get data grouped by computer
         function data = getDataGrouped(this,computers)
             if nargin<2
-                computers = [];
+                computers = this.computerFilter;
             end
             rawData = this.getData();
             data = {};
@@ -126,6 +127,22 @@ classdef UDPClient < handle
         end
         function removeSMIDataSender(this)
             UDPClient_matlab('removeSMIDataSender', this.objectHandle);
+        end
+        
+        
+        % getters and setters of the matlab class itself
+        function this = setComputerFilter(this, filter)
+            % set default filter, as well as filter on C side.
+            % NB: on the C-side, data acquired before this filter was set
+            % is not filtered out and will be returned to the matlab code.
+            % this means that if you call data getters that don't filter or
+            % if you set an empty filter that allows anything through, you
+            % may see a few of these samples. Calling filteredData getters
+            % such as getDataGrouped with no input argument will filter out
+            % these samples on the matlab side, so there is no issue
+            % anymore
+            this.computerFilter = filter;
+            UDPClient_matlab('setComputerFilter', this.objectHandle, filter);
         end
     end
 end

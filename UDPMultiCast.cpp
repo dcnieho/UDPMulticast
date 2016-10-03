@@ -247,6 +247,22 @@ void UDPMultiCast::setLoopBack(const BOOL& loopBack_)
     _loopBack = loopBack_;
 }
 
+void UDPMultiCast::setComputerFilter(double* computerFilter_, size_t numElements_)
+{
+	if (!numElements_ || computerFilter_ == nullptr)
+	{
+		_computerFilter.clear();
+		_hasComputerFilter = false;
+	}
+	else
+	{
+		for (size_t i = 0; i < numElements_; i++)
+			_computerFilter.insert(char(computerFilter_[i] + .5));
+
+		_hasComputerFilter = true;
+	}
+}
+
 void UDPMultiCast::setGroupAddress(const std::string& groupAddress_)
 {
     // leave old group, if any
@@ -437,28 +453,32 @@ unsigned int UDPMultiCast::threadFunction()
 #else
                 received.ip = pExtOverlapped->addr->sin_addr.S_un.S_un_b.s_b4;
 #endif
-                // parse message, store it, and see what to do with it
-                size_t headerLen, msgLen;
-                auto action = processMsg(pExtOverlapped->buf.buf, &headerLen, &msgLen);
-                received.text = msgLen >= headerLen ? _strdup(pExtOverlapped->buf.buf + headerLen) : new char{ '\0' }; // make sure always valid (if possibly empty) string
-                //cout << "read data: \"" << pExtOverlapped->buf.buf << "\" from " << addr << endl;
-
-                // adds to output queue or takes indicated action 
-                switch (action)
+                // if no filter, process all messages. if filter, process only the specified messages
+                if (!_hasComputerFilter || _computerFilter.find(received.ip) != _computerFilter.end())
                 {
-                case MsgAction::noAction:
-                    // nothing to do
-                    break;
-                case MsgAction::exit:
-                    // exit msg received, post exit msg to other threads and exit
-                    PostQueuedCompletionStatus(_hIOCP, 0, 0, 0);
-                    break;
-                case MsgAction::storeData:
-                    _receivedData.enqueue(received);
-                    break;
-                case MsgAction::storeCommand:
-                    _receivedCommands.enqueue(received);
-                    break;
+                    // parse message, store it, and see what to do with it
+                    size_t headerLen, msgLen;
+                    auto action = processMsg(pExtOverlapped->buf.buf, &headerLen, &msgLen);
+                    received.text = msgLen >= headerLen ? _strdup(pExtOverlapped->buf.buf + headerLen) : new char{ '\0' }; // make sure always valid (if possibly empty) string
+                    //cout << "read data: \"" << pExtOverlapped->buf.buf << "\" from " << addr << endl;
+
+                    // adds to output queue or takes indicated action 
+                    switch (action)
+                    {
+                    case MsgAction::noAction:
+                        // nothing to do
+                        break;
+                    case MsgAction::exit:
+                        // exit msg received, post exit msg to other threads and exit
+                        PostQueuedCompletionStatus(_hIOCP, 0, 0, 0);
+                        break;
+                    case MsgAction::storeData:
+                        _receivedData.enqueue(received);
+                        break;
+                    case MsgAction::storeCommand:
+                        _receivedCommands.enqueue(received);
+                        break;
+                    }
                 }
 
                 // queue up new receive request. Note that a completion packet will be queued up even if this returns immediately

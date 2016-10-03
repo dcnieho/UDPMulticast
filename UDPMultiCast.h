@@ -3,6 +3,7 @@
 #include "types.h"
 #include <vector>
 #include <string>
+#include <set>
 
 
 
@@ -43,6 +44,7 @@ public:
     void setNumQueuedReceives(const unsigned long& IOCPPendingReceives_);
     unsigned long getNumReceiverThreads() const { return _numIOCPThreads; };
     void setNumReceiverThreads(const unsigned long& numIOCPThreads_);
+	void setComputerFilter(double* computerFilter_, size_t numElements_);
 
 private:
     void sendInternal(EXTENDED_OVERLAPPED* sendOverlapped_);
@@ -76,6 +78,9 @@ private:
     EXTENDED_OVERLAPPED *_pExtOverlappedArray;
     queue_t<4096> _receivedData;
     queue_t<512>  _receivedCommands;
+	// filter for content to make it into the buffer
+	bool _hasComputerFilter = false;
+	std::set<char> _computerFilter;	// if not empty, only messages from computers in this set are processed
 
     // params and user prefs, with defaults
     bool _useWTP = false;

@@ -259,6 +259,15 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         // Call the method
         UDPinstance->setNumReceiverThreads(static_cast<unsigned long>(mxGetScalar(prhs[2])));
         return;
+	case ct::crc32("setComputerFilter"):
+		// Check parameters
+		if (nlhs < 0 || nrhs < 3)
+			mexErrMsgTxt("setComputerFilter: Expected (possibly empty) array of computers from which you want to receive messages.");
+		if (!mxIsDouble(prhs[2]) || mxIsComplex(prhs[2]))
+			mexErrMsgTxt("setComputerFilter: Array of computers from which you want to receive messages should be double.");
+		// Call the method
+		UDPinstance->setComputerFilter(mxGetPr(prhs[2]), mxGetNumberOfElements(prhs[2]));
+		return;
 #ifdef HAS_SMI_INTEGRATION
 	case ct::crc32("startSMIDataSender"):
 		UDPinstance->startSMIDataSender();
