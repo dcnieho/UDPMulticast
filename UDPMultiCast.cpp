@@ -182,7 +182,7 @@ void UDPMultiCast::send(const std::string msg_)
     sendInternal(sendOverlapped);
 }
 
-void UDPMultiCast::sendInternal(EXTENDED_OVERLAPPED * sendOverlapped_)
+void UDPMultiCast::sendInternal(EXTENDED_OVERLAPPED* sendOverlapped_)
 {
     // do send
     DWORD bytesSent = 0;
@@ -428,8 +428,15 @@ unsigned int UDPMultiCast::threadFunction()
             if (pExtOverlapped->isRead)
             {
                 message received;
+                // get timestamp asap
                 received.timeStamp = timeUtils::getTimeStamp();
+#ifdef IP_ADDR_AS_STR
+                // convert ip address to string.
+                // never any need for this, we just need the end of the ip address as number
                 inet_ntop(AF_INET, &(reinterpret_cast<sockaddr_in *>(pExtOverlapped->addr)->sin_addr), received.ip, INET_ADDRSTRLEN);
+#else
+                received.ip = pExtOverlapped->addr->sin_addr.S_un.S_un_b.s_b4;
+#endif
                 // parse message, store it, and see what to do with it
                 size_t headerLen, msgLen;
                 auto action = processMsg(pExtOverlapped->buf.buf, &headerLen, &msgLen);

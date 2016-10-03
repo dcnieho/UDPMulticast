@@ -52,19 +52,17 @@ classdef UDPClient < handle
             data = {};
             ips  = [];
             for p=1:length(rawData)
-                ipPieces = sscanf(rawData(p).ip,'%d.%d.%d.%d');
-                ip = ipPieces(end);
                 % optionally, only process messages from specified
                 % computers
-                if ~isempty(computers) && ~any(ip==computers)
+                if ~isempty(computers) && ~any(rawData(p).ip==computers)
                     continue
                 end
                 % find where in cell array to put 
-                qIp = ip==ips;
+                qIp = rawData(p).ip==ips;
                 if ~any(qIp)
-                    ips(end+1)    = ip;
-                    data(end+1,:) = {ip,int64([]),[]};
-                    qIp           = ip==ips;
+                    ips(end+1)    = rawData(p).ip;
+                    data(end+1,:) = {rawData(p).ip,int64([]),[]};
+                    qIp           = rawData(p).ip==ips;
                 end
                 str   = rawData(p).text;
                 commas= find(str==',');

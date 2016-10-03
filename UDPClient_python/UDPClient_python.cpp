@@ -24,7 +24,11 @@ BOOST_PYTHON_MODULE(UDPClient_python)
     class_<message>("message")
         .add_property("text", static_cast<std::string(*)(const message&)>([](const message& m) {return std::string(m.text); }))	// casting to function pointer the ugly way as unary plus does not seems to work with VS2015
         .add_property("timeStamp", &message::timeStamp)
+#ifdef IP_ADDR_AS_STR
         .add_property("ip", static_cast<std::string(*)(const message&)>([](const message& m) {return std::string(m.ip); }));
+#else
+        .add_property("ip", &message::ip);
+#endif
 
     // and a vector of messages
     class_<std::vector<message>>("messageList")

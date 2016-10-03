@@ -284,7 +284,12 @@ mxArray* msgVectorToMatlab(std::vector<message> msgs_)
         mxArray *temp;
         mxSetFieldByNumber(out, i, 1, temp = mxCreateNumericMatrix(1, 1, mxINT64_CLASS, mxREAL));
         *static_cast<long long*>(mxGetData(temp)) = msg.timeStamp;
+#ifdef IP_ADDR_AS_STR
         mxSetFieldByNumber(out, i, 2, mxCreateString(msg.ip));
+#else
+		mxSetFieldByNumber(out, i, 2, temp = mxCreateNumericMatrix(1, 1, mxDOUBLE_CLASS, mxREAL));
+		*static_cast<double*>(mxGetData(temp)) = double(msg.ip);
+#endif
         i++;
     }
     return out;
