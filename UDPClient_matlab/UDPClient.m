@@ -68,7 +68,7 @@ classdef UDPClient < handle
                 str   = rawData(p).text;
                 commas= find(str==',');
                 % moet los, anders krijg je doubles ookal zeg je %*f
-                % eerste de timestamps
+                % eerst de timestamps
                 str(commas(1):commas(end)-1) = '';
                 timestamps = sscanf(str,'%ld,%ld');
                 % dat de data
@@ -76,6 +76,29 @@ classdef UDPClient < handle
                 % store
                 data{qIp,2}(end+1,:) = [timestamps.' rawData(p).timeStamp];   % SMI timestamp, send timestamp, receive timestamp
                 data{qIp,3}(end+1,:) = gazeData;  % leftX, leftY, rightX, rightY
+            end
+        end
+        % get cmds, filtered and parsed
+        function cmds = getCommandsFiltered(this,computers)
+            if nargin<2
+                computers = this.computerFilter;
+            end
+            rawCmd = this.getCommands();
+            cmds = cell(length(rawCmd),3);
+            for p=1:length(rawCmd)
+                % optionally, only process messages from specified
+                % computers
+                if ~isempty(computers) && ~any(rawCmd(p).ip==computers)
+                    continue
+                end
+                cmds{p,1} = rawCmd(p).ip;
+                % moet los, anders krijg je doubles ookal zeg je %*f
+                % eerst de timestamps
+                commas= find(rawCmd(p).text==',');
+                timestamps = sscanf(rawCmd(p).text(commas(1)+1:end),'%ld');
+                % store
+                cmds{p,2} = [timestamps rawCmd(p).timeStamp];   % send timestamp, receive timestamp
+                cmds{p,3} = rawCmd(p).text(1:commas(1)-1);
             end
         end
         
