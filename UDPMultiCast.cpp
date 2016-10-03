@@ -180,6 +180,18 @@ void UDPMultiCast::send(const std::string msg_)
     //cout << "sending:  \"" << _sendOverlapped.buf.buf << "\"" << endl;
 
     sendInternal(sendOverlapped);
+
+#ifdef HAS_SMI_INTEGRATION
+	// send command directly to file so that we know as precisely (and with as low latency) as possible when it arrived
+	// this can be used for sync between pairs of systems
+	size_t headerLen_, msgLen_;
+	if (MsgType::command == UDPMultiCast::processMsg(sendOverlapped->buf.buf, &headerLen_, &msgLen_))
+	{
+		char buf[256];
+		snprintf(buf, sizeof(buf), "send: %s", sendOverlapped->buf.buf);
+		iV_SendImageMessage(buf);
+	}
+#endif
 }
 
 void UDPMultiCast::sendInternal(EXTENDED_OVERLAPPED* sendOverlapped_)
@@ -477,6 +489,13 @@ unsigned int UDPMultiCast::threadFunction()
                         break;
                     case MsgType::command:
                         _receivedCommands.enqueue(received);
+#ifdef HAS_SMI_INTEGRATION
+                        // send command directly to file so that we know as precisely (and with as low latency) as possible when it arrived
+                        // this can be used for sync between pairs of systems
+                        char buf[256];
+                        snprintf(buf, sizeof(buf), "%d: %s,%lld", received.ip, received.text, received.timeStamp);
+                        iV_SendImageMessage(buf);
+#endif
                         break;
                     }
                 }
