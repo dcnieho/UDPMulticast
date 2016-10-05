@@ -95,10 +95,10 @@ classdef UDPClient < handle
                 % moet los, anders krijg je doubles ookal zeg je %*f
                 % eerst de timestamps
                 commas= find(rawCmd(p).text==',');
-                timestamps = sscanf(rawCmd(p).text(commas(1)+1:end),'%ld');
+                timestamps = sscanf(rawCmd(p).text(commas(end)+1:end),'%ld');
                 % store
                 cmds{p,2} = [timestamps rawCmd(p).timeStamp];   % send timestamp, receive timestamp
-                cmds{p,3} = rawCmd(p).text(1:commas(1)-1);
+                cmds{p,3} = rawCmd(p).text(1:commas(end)-1);
             end
         end
         
