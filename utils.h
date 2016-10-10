@@ -158,8 +158,9 @@ inline LPVOID AllocateBufferSpace(
 }
 
 namespace timeUtils {
-    // time stamp provider. Must call initTimeStamping before first use
     // if WTP==true, try and use Windows Timestamp Project code, else use Windows native calls
     void initTimeStamping(bool setMaxClockRes = true, bool WTP = true);
+
+    // time stamp provider. Must call initTimeStamping before first use
     int64_t getTimeStamp();	// signed so we don't get in trouble if user does calculations with output that yield negative numbers
 }

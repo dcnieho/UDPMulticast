@@ -3,6 +3,7 @@
 #include "mex.h"
 #include "class_handle.hpp"
 #include "../strHash.h"
+#include "../utils.h"
 
 #include <cwchar>
 #include <algorithm>
@@ -268,6 +269,15 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
 		// Call the method
 		UDPinstance->setComputerFilter(mxGetPr(prhs[2]), mxGetNumberOfElements(prhs[2]));
 		return;
+    case ct::crc32("getCurrentTime"):
+        // NB: do not call until timestamping is inited (i.e., init was called on the udp class)
+        // Check parameters
+        if (nlhs < 1 || nrhs < 2)
+            mexErrMsgTxt("getCurrentTime: Unexpected arguments.");
+        // Call the method
+        plhs[0] = mxCreateNumericMatrix(1, 1, mxINT64_CLASS, mxREAL);
+        *static_cast<long long*>(mxGetData(plhs[0])) = timeUtils::getTimeStamp();
+        return;
 #ifdef HAS_SMI_INTEGRATION
 	case ct::crc32("startSMIDataSender"):
 		UDPinstance->startSMIDataSender();

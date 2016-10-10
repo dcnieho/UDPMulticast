@@ -8,17 +8,21 @@ extern "C" { FILE __iob_func[3] = { *stdin,*stdout,*stderr }; }
 
 
 namespace {
+    typedef int64_t (*fpGetTimeStamp) (void);
+    fpGetTimeStamp getTimeFun = nullptr;
+    
     // filetime to UNIX epoch
     int64_t ftimeToUNIX(int64_t ftime)
     {
         // Windows file times are in 100s of nanoseconds.
         // Convert to microseconds by dividing by 10.
+        // Make sure its a rounding division, by applying int i = (x + (n / 2)) / n;
 
         // Then convert to Unix epoch:
         // Between January 1, 1601 and January 1, 1970, there were 369 complete years,
         // of which 89 were leap years (1700, 1800, and 1900 were not leap years).
         // That is a total of 134774 days, which is 11644473600 seconds.
-        return ftime / 10 - 11644473600 * 100000;
+        return (ftime+5) / 10 - 11644473600 * 1000 * 1000;
     }
     int64_t ftimeToUNIX(FILETIME ftime)
     {
@@ -49,10 +53,7 @@ namespace {
         GetSystemTimeAsFileTime(&ft);
         return ftimeToUNIX(ft);
     }
-
-    typedef int64_t (*fpGetTimeStamp) (void);
-    fpGetTimeStamp getTimeFun = nullptr;
-
+    
     void setMaxClockResolution()
     {
         // set system timer to highest resolution possible
@@ -114,6 +115,6 @@ namespace timeUtils {
 
     int64_t getTimeStamp()	// signed so we don't get in trouble if user does calculations with output that yield negative numbers
     {
-        return getTimeFun();
+        return getTimeFun ? getTimeFun() : 0;
     }
 }

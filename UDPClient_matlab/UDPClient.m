@@ -145,6 +145,9 @@ classdef UDPClient < handle
         function setNumReceiverThreads(this, varargin)
             UDPClient_matlab('setNumReceiverThreads', this.objectHandle, varargin{:});
         end
+        function time = getCurrentTime(this)
+            time = UDPClient_matlab('getCurrentTime', this.objectHandle);
+        end
         function startSMIDataSender(this)
             UDPClient_matlab('startSMIDataSender', this.objectHandle);
         end

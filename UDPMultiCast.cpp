@@ -14,6 +14,8 @@
 
 UDPMultiCast::UDPMultiCast()
 {
+    // initialize timestamp provider. When user changes settings, timestamper is automatically inited again
+    timeUtils::initTimeStamping(_setMaxClockRes,_useWTP);
 }
 
 UDPMultiCast::~UDPMultiCast()
@@ -23,9 +25,6 @@ UDPMultiCast::~UDPMultiCast()
 
 void UDPMultiCast::init()
 {
-    // initialize timestamp provider
-    timeUtils::initTimeStamping(_setMaxClockRes,_useWTP);
-
     // InitialiseWinsock
     WSADATA data;
     if (0 != ::WSAStartup(MAKEWORD(2, 2), &data))
@@ -126,7 +125,7 @@ void UDPMultiCast::deInit()
         // nothing to do
         return;
 
-	//
+	// remove smi callback
 #ifdef HAS_SMI_INTEGRATION
 	if (_smiDataSenderStarted)
 		removeSMIDataSender();
@@ -236,18 +235,18 @@ std::string UDPMultiCast::getGitRefID() const
 
 void UDPMultiCast::setUseWTP(bool useWTP_)
 {
-    if (_initialized)
-        ErrorMsgExit("cannot set usage of WTP timestamping when already initialized");
-
     _useWTP = useWTP_;
+
+    // re-initialize timestamp provider
+    timeUtils::initTimeStamping(_setMaxClockRes,_useWTP);
 }
 
 void UDPMultiCast::setMaxClockRes(bool setMaxClockRes_)
 {
-    if (_initialized)
-        ErrorMsgExit("cannot set maximum clock resolution when already initialized");
-
     _setMaxClockRes = setMaxClockRes_;
+
+    // re-initialize timestamp provider
+    timeUtils::initTimeStamping(_setMaxClockRes,_useWTP);
 }
 
 void UDPMultiCast::setLoopBack(const BOOL& loopBack_)
