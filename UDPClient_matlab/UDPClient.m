@@ -4,11 +4,13 @@ classdef UDPClient < handle
     properties (SetAccess = private, Hidden = true)
         objectHandle; % Handle to the underlying C++ class instance
         computerFilter = [];
+        hasSMIIntegration;
     end
     methods
         %% Constructor - Create a new C++ class instance 
         function this = UDPClient(varargin)
-            this.objectHandle = UDPClient_matlab('new', varargin{:});
+            this.objectHandle       = UDPClient_matlab('new', varargin{:});
+            this.hasSMIIntegration  = UDPClient_matlab('hasSMIIntegration', this.objectHandle);
         end
         
         %% Destructor - Destroy the C++ class instance
@@ -148,10 +150,14 @@ classdef UDPClient < handle
         function time = getCurrentTime(this)
             time = UDPClient_matlab('getCurrentTime', this.objectHandle);
         end
+        
+        % if compiled with SMI integration only
         function startSMIDataSender(this)
+            assert(this.hasSMIIntegration,'Can''t startSMIDataSender, UDPClient mex compiled without SMI integration')
             UDPClient_matlab('startSMIDataSender', this.objectHandle);
         end
         function removeSMIDataSender(this)
+            assert(this.hasSMIIntegration,'Can''t startSMIDataSender, UDPClient mex compiled without SMI integration')
             UDPClient_matlab('removeSMIDataSender', this.objectHandle);
         end
         
