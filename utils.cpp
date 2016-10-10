@@ -104,9 +104,9 @@ namespace timeUtils {
         {
             if (IsWindows8OrGreater())
             {
-                getTimeFun = &getTimeStampGetSystemTimePreciseAsFileTime;
                 HMODULE hMod = GetModuleHandle(L"kernel32");
                 GetPreciseTime = (fpGetSystemTimePreciseAsFileTime)GetProcAddress(hMod, "GetSystemTimePreciseAsFileTime");
+                getTimeFun = &getTimeStampGetSystemTimePreciseAsFileTime;
             }
             else
                 getTimeFun = &getTimeStampGetSystemTimeAsFileTime;

@@ -270,7 +270,6 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
 		UDPinstance->setComputerFilter(mxGetPr(prhs[2]), mxGetNumberOfElements(prhs[2]));
 		return;
     case ct::crc32("getCurrentTime"):
-        // NB: do not call until timestamping is inited (i.e., init was called on the udp class)
         // Check parameters
         if (nlhs < 1 || nrhs < 2)
             mexErrMsgTxt("getCurrentTime: Unexpected arguments.");
