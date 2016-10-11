@@ -147,7 +147,14 @@ inline LPVOID AllocateBufferSpace(
     nBuffersAllocated = std::min<DWORD>(nBuffers, static_cast<DWORD>(actualSize / bufferSize));
 
     DWORD totalBufferSize = static_cast<DWORD>(actualSize);
-    LPVOID pBuffer = VirtualAllocExNuma(GetCurrentProcess(), 0, totalBufferSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE, preferredNumaNode);
+    LPVOID pBuffer = VirtualAllocExNuma(GetCurrentProcess(), NULL, totalBufferSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE, preferredNumaNode);
+    // VirtualAllocExNuma only allocates virtual pages, it does not associate valid physical memory pages within them
+    // The FillMemory call below will touch every page in the buffer, faulting
+    // them into our working set. When this happens physical pages will be allocated
+    // from the preferred node we specified in VirtualAllocExNuma, or any node
+    // if the preferred one is out of pages.
+    FillMemory(pBuffer, totalBufferSize, 0);
+
 
     if (pBuffer == 0)
     {
