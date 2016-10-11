@@ -5,6 +5,8 @@ classdef UDPClient < handle
         objectHandle; % Handle to the underlying C++ class instance
         computerFilter = [];
         hasSMIIntegration;
+        
+        parsedCommandBuffer = {};
     end
     methods
         %% Constructor - Create a new C++ class instance 
@@ -47,11 +49,15 @@ classdef UDPClient < handle
             cmds = UDPClient_matlab('getCommands', this.objectHandle);
         end
         % get data grouped by computer
-        function data = getDataGrouped(this,computers)
+        function data = getDataGrouped(this, computers)
+            % get default filter if not specified
             if nargin<2
                 computers = this.computerFilter;
             end
+            % get data messages from C++ buffer
             rawData = this.getData();
+            % parse into {ip, timestamps, data}, with possibly multiple
+            % rows of timestamps and data per computer
             data = {};
             ips  = [];
             for p=1:length(rawData)
@@ -80,30 +86,36 @@ classdef UDPClient < handle
                 data{qIp,3}(end+1,:) = gazeData;  % leftX, leftY, rightX, rightY
             end
         end
-        % get cmds, filtered and parsed
-        function cmds = getCommandsFiltered(this,computers)
+        % get cmds, one at a time, filtered and parsed
+        function cmd = getSingleCommand(this, computers)
+            cmd = [];
+            % get default filter if not specified
             if nargin<2
                 computers = this.computerFilter;
             end
-            rawCmd = this.getCommands();
-            cmds = cell(length(rawCmd),3);
-            for p=1:length(rawCmd)
-                % optionally, only process messages from specified
-                % computers
-                if ~isempty(computers) && ~any(rawCmd(p).ip==computers)
-                    continue
-                end
-                cmds{p,1} = rawCmd(p).ip;
-                % moet los, anders krijg je doubles ookal zeg je %*f
-                % eerst de timestamps
-                commas= find(rawCmd(p).text==',');
-                timestamps = sscanf(rawCmd(p).text(commas(end)+1:end),'%ld');
-                % store
-                cmds{p,2} = [timestamps rawCmd(p).timeStamp];   % send timestamp, receive timestamp
-                cmds{p,3} = rawCmd(p).text(1:commas(end)-1);
+            % If our buffer is empty, see if any new commands have arrived
+            if isempty(this.parsedCommandBuffer)
+                this.fillCommandBuffer();
             end
-            % remove empty lines (can happen if we skip a command)
-            cmds(cellfun(@isempty,cmds(:,1)),:) = [];
+            % see if there is any command to return
+            if ~isempty(this.parsedCommandBuffer)
+                % loop until we have a command that matches filter
+                % things that do not match filter are discarded forever
+                while true
+                    % pop first-in command and return that
+                    cmd = this.parsedCommandBuffer(1,:);
+                    this.parsedCommandBuffer(1,:) = [];
+                    
+                    if isempty(computers) || any(rawCmd(p).ip==computers)
+                        % matches filter, return it
+                        return;
+                    elseif isempty(this.parsedCommandBuffer)
+                        % nothing left, return empty
+                        cmd = [];
+                        return;
+                    end
+                end
+            end
         end
         
         % getters and setters
@@ -177,6 +189,27 @@ classdef UDPClient < handle
             % anymore
             this.computerFilter = filter;
             UDPClient_matlab('setComputerFilter', this.objectHandle, filter);
+        end
+    end
+    
+    methods (Access = private, Hidden = true)
+        function cmds = fillCommandBuffer(this)
+            % get cmd messages from C++ buffer
+            rawCmd = this.getCommands();
+            % parse into {ip, timestamps, message}
+            cmds   = cell(length(rawCmd),3);
+            for p=1:length(rawCmd)
+                cmds{p,1} = rawCmd(p).ip;
+                % moet los, anders krijg je doubles ookal zeg je %*f
+                % eerst de timestamps
+                commas= find(rawCmd(p).text==',');
+                timestamps = sscanf(rawCmd(p).text(commas(end)+1:end),'%ld');
+                % store
+                cmds{p,2} = [timestamps rawCmd(p).timeStamp];   % send timestamp, receive timestamp
+                cmds{p,3} = rawCmd(p).text(1:commas(end)-1);
+            end
+            % add parsed commands to buffer
+            this.parsedCommandBuffer = [this.parsedCommandBuffer; cmds];
         end
     end
 end
