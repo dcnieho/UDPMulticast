@@ -67,8 +67,8 @@ classdef UDPClient < handle
                     data(end+1,:) = {rawData(p).ip,int64([]),[]};
                     qIp           = rawData(p).ip==ips;
                 end
-                str   = rawData(p).text;
-                commas= find(str==',');
+                str    = rawData(p).text;
+                commas = find(str==',');
                 % moet los, anders krijg je doubles ookal zeg je %*f
                 % eerst de timestamps
                 str(commas(1):commas(end)-1) = '';
@@ -102,6 +102,8 @@ classdef UDPClient < handle
                 cmds{p,2} = [timestamps rawCmd(p).timeStamp];   % send timestamp, receive timestamp
                 cmds{p,3} = rawCmd(p).text(1:commas(end)-1);
             end
+            % remove empty lines (can happen if we skip a command)
+            cmds(cellfun(@isempty,cmds(:,1)),:) = [];
         end
         
         % getters and setters
