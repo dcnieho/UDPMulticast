@@ -472,6 +472,8 @@ unsigned int UDPMultiCast::threadFunction()
                     auto action = processMsg(pExtOverlapped->buf.buf, &headerLen, &msgLen);
                     received.text = msgLen >= headerLen ? _strdup(pExtOverlapped->buf.buf + headerLen) : new char{ '\0' }; // make sure always valid (if possibly empty) string
                     //cout << "read data: \"" << pExtOverlapped->buf.buf << "\" from " << addr << endl;
+                    // overwrite msg with null so we keep our receive buffer clean
+                    memset(pExtOverlapped->buf.buf,'\0',msgLen);
 
                     // adds to output queue or takes indicated action 
                     switch (action)
