@@ -15,8 +15,15 @@ struct EXTENDED_OVERLAPPED : public OVERLAPPED
 
 typedef std::deque<HANDLE> Threads;
 
-struct message
+class message
 {
+public:
+    ~message()
+    {
+        if (text)
+            delete[] text;
+    }
+
     char* text;
     int64_t timeStamp;	// receive timestamp
 #ifdef IP_ADDR_AS_STR
