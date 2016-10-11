@@ -1,7 +1,7 @@
 % MATLAB class wrapper to underlying C++ class UDPClient
 
 classdef UDPClient < handle
-    properties (SetAccess = private, Hidden = true)
+    properties (Access = private, Hidden = true)
         objectHandle; % Handle to the underlying C++ class instance
         computerFilter = [];
         hasSMIIntegration;
