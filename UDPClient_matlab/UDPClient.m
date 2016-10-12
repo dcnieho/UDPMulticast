@@ -102,16 +102,18 @@ classdef UDPClient < handle
                 % loop until we have a command that matches filter
                 % things that do not match filter are discarded forever
                 while true
+                    if isempty(this.parsedCommandBuffer)
+                        % nothing left, return empty
+                        cmd = [];
+                        return;
+                    end
+                    
                     % pop first-in command and return that
                     cmd = this.parsedCommandBuffer(1,:);
                     this.parsedCommandBuffer(1,:) = [];
-                    
-                    if isempty(computers) || any(rawCmd(p).ip==computers)
+                    % see if its a message we want
+                    if isempty(computers) || any(cmd{1}==computers)
                         % matches filter, return it
-                        return;
-                    elseif isempty(this.parsedCommandBuffer)
-                        % nothing left, return empty
-                        cmd = [];
                         return;
                     end
                 end
