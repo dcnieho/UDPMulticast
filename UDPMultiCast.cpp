@@ -489,9 +489,12 @@ unsigned int UDPMultiCast::threadFunction()
 #ifdef HAS_SMI_INTEGRATION
                         // send command directly to file so that we know as precisely (and with as low latency) as possible when it arrived
                         // this can be used for sync between pairs of systems
-                        char buf[256];
-                        snprintf(buf, sizeof(buf), "%d: %s,%lld", senderIP, pExtOverlapped->buf.buf, receiveTimeStamp);
-                        iV_SendImageMessage(buf);
+                        if (msgLen >= headerLen)
+                        {
+                            char buf[256];
+                            snprintf(buf, sizeof(buf), "%d: %s,%lld", senderIP, pExtOverlapped->buf.buf, receiveTimeStamp);
+                            iV_SendImageMessage(buf);
+                        }
 #endif
                         break;
                     }
