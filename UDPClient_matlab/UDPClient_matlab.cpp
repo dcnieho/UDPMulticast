@@ -307,7 +307,7 @@ mxArray* msgVectorToMatlab(std::vector<message> msgs_)
     size_t i = 0;
     for (auto &msg : msgs_)
     {
-        mxSetFieldByNumber(out, i, 0, mxCreateString(msg.text));
+        mxSetFieldByNumber(out, i, 0, mxCreateString(msg.text.get()));
         mxArray *temp;
         mxSetFieldByNumber(out, i, 1, temp = mxCreateNumericMatrix(1, 1, mxINT64_CLASS, mxREAL));
         *static_cast<long long*>(mxGetData(temp)) = msg.timeStamp;

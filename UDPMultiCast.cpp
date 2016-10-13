@@ -454,26 +454,22 @@ unsigned int UDPMultiCast::threadFunction()
 
             if (pExtOverlapped->isRead)
             {
-                message received;
                 // get timestamp asap
-                received.timeStamp = timeUtils::getTimeStamp();
+                int64_t receiveTimeStamp = timeUtils::getTimeStamp();
 #ifdef IP_ADDR_AS_STR
                 // convert ip address to string.
                 // never any need for this, we just need the end of the ip address as number
                 inet_ntop(AF_INET, &(reinterpret_cast<sockaddr_in *>(pExtOverlapped->addr)->sin_addr), received.ip, INET_ADDRSTRLEN);
 #else
-                received.ip = pExtOverlapped->addr->sin_addr.S_un.S_un_b.s_b4;
+                auto senderIP = pExtOverlapped->addr->sin_addr.S_un.S_un_b.s_b4;
 #endif
                 // if no filter, process all messages. if filter, process only the specified messages
-                if (!_hasComputerFilter || _computerFilter.find(received.ip) != _computerFilter.end())
+                if (!_hasComputerFilter || _computerFilter.find(senderIP) != _computerFilter.end())
                 {
                     // parse message, store it, and see what to do with it
                     size_t headerLen, msgLen;
                     auto action = processMsg(pExtOverlapped->buf.buf, &headerLen, &msgLen);
-                    received.text = msgLen >= headerLen ? _strdup(pExtOverlapped->buf.buf + headerLen) : new char{ '\0' }; // make sure always valid (if possibly empty) string
-                    //cout << "read data: \"" << pExtOverlapped->buf.buf << "\" from " << addr << endl;
-                    // overwrite msg with null so we keep our receive buffer clean
-                    memset(pExtOverlapped->buf.buf,'\0',msgLen);
+                    auto msg = msgLen >= headerLen ? _strdup(pExtOverlapped->buf.buf + headerLen) : new char{ '\0' }; // make sure always valid (if possibly empty) string
 
                     // adds to output queue or takes indicated action 
                     switch (action)
@@ -486,19 +482,22 @@ unsigned int UDPMultiCast::threadFunction()
                         PostQueuedCompletionStatus(_hIOCP, 0, 0, 0);
                         break;
                     case MsgType::data:
-                        _receivedData.enqueue(received);
+                        _receivedData.enqueue(message(senderIP,msg,receiveTimeStamp));
                         break;
                     case MsgType::command:
-                        _receivedCommands.enqueue(received);
+                        _receivedCommands.enqueue(message(senderIP,msg,receiveTimeStamp));
 #ifdef HAS_SMI_INTEGRATION
                         // send command directly to file so that we know as precisely (and with as low latency) as possible when it arrived
                         // this can be used for sync between pairs of systems
                         char buf[256];
-                        snprintf(buf, sizeof(buf), "%d: %s,%lld", received.ip, received.text, received.timeStamp);
+                        snprintf(buf, sizeof(buf), "%d: %s,%lld", senderIP, pExtOverlapped->buf.buf, receiveTimeStamp);
                         iV_SendImageMessage(buf);
 #endif
                         break;
                     }
+
+                    // overwrite msg with null so we keep our receive buffer clean
+                    memset(pExtOverlapped->buf.buf,'\0',msgLen);
                 }
 
                 // queue up new receive request. Note that a completion packet will be queued up even if this returns immediately

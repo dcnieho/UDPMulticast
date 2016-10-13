@@ -45,7 +45,7 @@ public:
 
     ~mpmc_bounded_queue() {}
 
-    bool enqueue(T const& data)
+    bool enqueue(T& data)
     {
         cell_t* cell;
         size_t pos = enqueue_pos_.load(std::memory_order_relaxed);
@@ -65,7 +65,7 @@ public:
                 pos = enqueue_pos_.load(std::memory_order_relaxed);
         }
 
-        cell->data_ = data;
+        cell->data_ = std::move(data);
         cell->sequence_.store(pos + 1, std::memory_order_release);
 
         return true;
@@ -91,7 +91,7 @@ public:
                 pos = dequeue_pos_.load(std::memory_order_relaxed);
         }
 
-        data = cell->data_;
+        data = std::move(cell->data_);
         cell->sequence_.store(pos + buffer_mask_ + 1, std::memory_order_release);
 
         return true;
