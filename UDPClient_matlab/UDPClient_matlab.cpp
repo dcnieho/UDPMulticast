@@ -12,11 +12,11 @@ mxArray* msgVectorToMatlab(std::vector<message> msgs_);
 
 void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-	// Get the command string
-	char cmd[64] = {0};
+    // Get the command string
+    char cmd[64] = {0};
     if (nrhs < 1 || mxGetString(prhs[0], cmd, sizeof(cmd)))
         mexErrMsgTxt("First input should be a command string less than 64 characters long.");
-	size_t nChar = std::min(strlen(cmd),size_t(64));
+    size_t nChar = std::min(strlen(cmd),size_t(64));
 
     // New
     if (!strcmp("new", cmd)) {
@@ -260,15 +260,15 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         // Call the method
         UDPinstance->setNumReceiverThreads(static_cast<unsigned long>(mxGetScalar(prhs[2])));
         return;
-	case ct::crc32("setComputerFilter"):
-		// Check parameters
-		if (nlhs < 0 || nrhs < 3)
-			mexErrMsgTxt("setComputerFilter: Expected (possibly empty) array of computers from which you want to receive messages.");
-		if (!mxIsDouble(prhs[2]) || mxIsComplex(prhs[2]))
-			mexErrMsgTxt("setComputerFilter: Array of computers from which you want to receive messages should be double.");
-		// Call the method
-		UDPinstance->setComputerFilter(mxGetPr(prhs[2]), mxGetNumberOfElements(prhs[2]));
-		return;
+    case ct::crc32("setComputerFilter"):
+        // Check parameters
+        if (nlhs < 0 || nrhs < 3)
+            mexErrMsgTxt("setComputerFilter: Expected (possibly empty) array of computers from which you want to receive messages.");
+        if (!mxIsDouble(prhs[2]) || mxIsComplex(prhs[2]))
+            mexErrMsgTxt("setComputerFilter: Array of computers from which you want to receive messages should be double.");
+        // Call the method
+        UDPinstance->setComputerFilter(mxGetPr(prhs[2]), mxGetNumberOfElements(prhs[2]));
+        return;
     case ct::crc32("getCurrentTime"):
         // Check parameters
         if (nlhs < 1 || nrhs < 2)
@@ -282,12 +282,12 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         plhs[0] = mxCreateNumericMatrix(1, 1, mxLOGICAL_CLASS, mxREAL);
         *static_cast<bool*>(mxGetData(plhs[0])) = true;
         return;
-	case ct::crc32("startSMIDataSender"):
-		UDPinstance->startSMIDataSender();
-		return;
-	case ct::crc32("removeSMIDataSender"):
-		UDPinstance->removeSMIDataSender();
-		return;
+    case ct::crc32("startSMIDataSender"):
+        UDPinstance->startSMIDataSender();
+        return;
+    case ct::crc32("removeSMIDataSender"):
+        UDPinstance->removeSMIDataSender();
+        return;
 #else
     case ct::crc32("hasSMIIntegration"):
         plhs[0] = mxCreateNumericMatrix(1, 1, mxLOGICAL_CLASS, mxREAL);
@@ -314,8 +314,8 @@ mxArray* msgVectorToMatlab(std::vector<message> msgs_)
 #ifdef IP_ADDR_AS_STR
         mxSetFieldByNumber(out, i, 2, mxCreateString(msg.ip));
 #else
-		mxSetFieldByNumber(out, i, 2, temp = mxCreateNumericMatrix(1, 1, mxDOUBLE_CLASS, mxREAL));
-		*static_cast<double*>(mxGetData(temp)) = double(msg.ip);
+        mxSetFieldByNumber(out, i, 2, temp = mxCreateNumericMatrix(1, 1, mxDOUBLE_CLASS, mxREAL));
+        *static_cast<double*>(mxGetData(temp)) = double(msg.ip);
 #endif
         i++;
     }

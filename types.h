@@ -46,7 +46,7 @@ public:
 #ifdef IP_ADDR_AS_STR
         return timeStamp == b.timeStamp && !strcmp(text.get(), b.text.get()) && !strcmp(ip, b.ip);  // strcmp outputs 0 when inputs identical
 #else
-		return timeStamp == b.timeStamp && !strcmp(text.get(), b.text.get()) && ip==b.ip;           // strcmp outputs 0 when inputs identical
+        return timeStamp == b.timeStamp && !strcmp(text.get(), b.text.get()) && ip==b.ip;           // strcmp outputs 0 when inputs identical
 #endif
     };
 

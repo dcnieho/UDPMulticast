@@ -44,7 +44,7 @@ public:
     void setNumQueuedReceives(const unsigned long& IOCPPendingReceives_);
     unsigned long getNumReceiverThreads() const { return _numIOCPThreads; };
     void setNumReceiverThreads(const unsigned long& numIOCPThreads_);
-	void setComputerFilter(double* computerFilter_, size_t numElements_);
+    void setComputerFilter(double* computerFilter_, size_t numElements_);
 
 private:
     void sendInternal(EXTENDED_OVERLAPPED* sendOverlapped_);
@@ -53,7 +53,7 @@ private:
     void waitIOCPThreadsStop();
     static unsigned int __stdcall startThreadFunction(void *pV);
     unsigned int threadFunction();
-	MsgType processMsg(const char* msg_, size_t *headerLen_, size_t *msgLen_);
+    MsgType processMsg(const char* msg_, size_t *headerLen_, size_t *msgLen_);
 
     // for executing option changes
     void setupLoopBack(const BOOL loopBack_);
@@ -78,9 +78,9 @@ private:
     EXTENDED_OVERLAPPED *_pExtOverlappedArray;
     queue_t<4096> _receivedData;
     queue_t<512>  _receivedCommands;
-	// filter for content to make it into the buffer
-	bool _hasComputerFilter = false;
-	std::set<char> _computerFilter;	// if not empty, only messages from computers in this set are processed
+    // filter for content to make it into the buffer
+    bool _hasComputerFilter = false;
+    std::set<char> _computerFilter;	// if not empty, only messages from computers in this set are processed
 
     // params and user prefs, with defaults
     bool _useWTP = false;
@@ -95,13 +95,13 @@ private:
     std::string _groupAddress = "224.0.0.9";
     BOOL _loopBack = FALSE;
 
-	// SMI data read integration
+    // SMI data read integration
 #ifdef HAS_SMI_INTEGRATION
 public:
-	void startSMIDataSender(bool needConnect = false);
-	void removeSMIDataSender();
+    void startSMIDataSender(bool needConnect = false);
+    void removeSMIDataSender();
 private:
-	bool _smiDataSenderStarted = false;
+    bool _smiDataSenderStarted = false;
 #endif // DEBUG
 
 };

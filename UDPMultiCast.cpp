@@ -125,10 +125,10 @@ void UDPMultiCast::deInit()
         // nothing to do
         return;
 
-	// remove smi callback
+    // remove smi callback
 #ifdef HAS_SMI_INTEGRATION
-	if (_smiDataSenderStarted)
-		removeSMIDataSender();
+    if (_smiDataSenderStarted)
+        removeSMIDataSender();
 #endif
 
     // leave multicast group
@@ -181,15 +181,15 @@ void UDPMultiCast::send(const std::string msg_)
     sendInternal(sendOverlapped);
 
 #ifdef HAS_SMI_INTEGRATION
-	// send command directly to file so that we know as precisely (and with as low latency) as possible when it arrived
-	// this can be used for sync between pairs of systems
-	size_t headerLen_, msgLen_;
-	if (MsgType::command == UDPMultiCast::processMsg(sendOverlapped->buf.buf, &headerLen_, &msgLen_))
-	{
-		char buf[256];
-		snprintf(buf, sizeof(buf), "send: %s", sendOverlapped->buf.buf);
-		iV_SendImageMessage(buf);
-	}
+    // send command directly to file so that we know as precisely (and with as low latency) as possible when it arrived
+    // this can be used for sync between pairs of systems
+    size_t headerLen_, msgLen_;
+    if (MsgType::command == UDPMultiCast::processMsg(sendOverlapped->buf.buf, &headerLen_, &msgLen_))
+    {
+        char buf[256];
+        snprintf(buf, sizeof(buf), "send: %s", sendOverlapped->buf.buf);
+        iV_SendImageMessage(buf);
+    }
 #endif
 }
 
@@ -260,18 +260,18 @@ void UDPMultiCast::setLoopBack(const BOOL& loopBack_)
 
 void UDPMultiCast::setComputerFilter(double* computerFilter_, size_t numElements_)
 {
-	if (!numElements_ || computerFilter_ == nullptr)
-	{
-		_computerFilter.clear();
-		_hasComputerFilter = false;
-	}
-	else
-	{
-		for (size_t i = 0; i < numElements_; i++)
-			_computerFilter.insert(char(computerFilter_[i] + .5));
+    if (!numElements_ || computerFilter_ == nullptr)
+    {
+        _computerFilter.clear();
+        _hasComputerFilter = false;
+    }
+    else
+    {
+        for (size_t i = 0; i < numElements_; i++)
+            _computerFilter.insert(char(computerFilter_[i] + .5));
 
-		_hasComputerFilter = true;
-	}
+        _hasComputerFilter = true;
+    }
 }
 
 void UDPMultiCast::setGroupAddress(const std::string& groupAddress_)
@@ -539,15 +539,15 @@ MsgType UDPMultiCast::processMsg(const char *msg_, size_t *headerLen_, size_t *m
     memcpy(header, msg_, *headerLen_ - 1);	// -1 is safe as we're pointing to idx 1 at minimum
 
     // switchyard using constexpr cheapCrappyHash to hash switch values to integrals
-	// cheapCrappyHash is crappy because many collisions are possible and long strings don't fit in the returned integer (overflow!).
-	// For the three different strings below, it works and it is cheap to compute
+    // cheapCrappyHash is crappy because many collisions are possible and long strings don't fit in the returned integer (overflow!).
+    // For the three different strings below, it works and it is cheap to compute
     switch (cheapCrappyHash(header))
     {
-	case cheapCrappyHash("exit"):
+    case cheapCrappyHash("exit"):
         return MsgType::exit;
-	case cheapCrappyHash("dat"):
+    case cheapCrappyHash("dat"):
         return MsgType::data;
-	case cheapCrappyHash("cmd"):
+    case cheapCrappyHash("cmd"):
         return MsgType::command;
     default:
         return MsgType::unknown;
@@ -596,25 +596,25 @@ void UDPMultiCast::leaveMultiCast()
 
 #ifdef HAS_SMI_INTEGRATION
 namespace {
-	UDPMultiCast* classPtr = nullptr;
+    UDPMultiCast* classPtr = nullptr;
 }
 void UDPMultiCast::startSMIDataSender(bool needConnect /*= false*/)
 {
-	classPtr = this;
-	if (RET_SUCCESS != iV_SetSampleCallback(SMISampleCallback))
-		DoExitWithMsg("startSMIDataSender: iV_SetSampleCallback failed");
-	_smiDataSenderStarted = true;
+    classPtr = this;
+    if (RET_SUCCESS != iV_SetSampleCallback(SMISampleCallback))
+        DoExitWithMsg("startSMIDataSender: iV_SetSampleCallback failed");
+    _smiDataSenderStarted = true;
 }
 void UDPMultiCast::removeSMIDataSender()
 {
-	iV_SetSampleCallback(nullptr);
+    iV_SetSampleCallback(nullptr);
 }
 
 int __stdcall SMISampleCallback(SampleStruct sampleData)
 {
-	char buf[128] = { '\0' };
-	sprintf_s(buf, "dat,%lld,%.2f,%.2f,%.2f,%.2f", sampleData.timestamp, sampleData.leftEye.gazeX, sampleData.leftEye.gazeY, sampleData.rightEye.gazeX, sampleData.rightEye.gazeY);
-	classPtr->sendWithTimeStamp(buf);
-	return 1;
+    char buf[128] = { '\0' };
+    sprintf_s(buf, "dat,%lld,%.2f,%.2f,%.2f,%.2f", sampleData.timestamp, sampleData.leftEye.gazeX, sampleData.leftEye.gazeY, sampleData.rightEye.gazeX, sampleData.rightEye.gazeY);
+    classPtr->sendWithTimeStamp(buf);
+    return 1;
 }
 #endif
