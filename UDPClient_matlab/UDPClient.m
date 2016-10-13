@@ -29,7 +29,18 @@ classdef UDPClient < handle
             UDPClient_matlab('deInit', this.objectHandle);
         end
         function sendWithTimeStamp(this, varargin)
-            UDPClient_matlab('sendWithTimeStamp', this.objectHandle, varargin{:});
+            % check if first input is numeric, take that as the number of
+            % times to send the message
+            if isnumeric(varargin{1})
+                nSend = varargin{1};
+                varargin(1) = [];
+            else
+                nSend = 1;
+            end
+            % send message
+            for p=1:nSend
+                UDPClient_matlab('sendWithTimeStamp', this.objectHandle, varargin{:});
+            end
         end
         function send(this, varargin)
             UDPClient_matlab('send', this.objectHandle, varargin{:});
@@ -201,6 +212,7 @@ classdef UDPClient < handle
             % parse into {ip, timestamps, message}
             cmds   = cell(length(rawCmd),3);
             for p=1:length(rawCmd)
+                rawCmd(p).text
                 cmds{p,1} = rawCmd(p).ip;
                 % moet los, anders krijg je doubles ookal zeg je %*f
                 % eerst de timestamps
