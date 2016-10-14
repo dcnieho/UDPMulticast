@@ -469,7 +469,7 @@ unsigned int UDPMultiCast::threadFunction()
                     // parse message, store it, and see what to do with it
                     size_t headerLen, msgLen;
                     auto action = processMsg(pExtOverlapped->buf.buf, &headerLen, &msgLen);
-                    auto msg = msgLen >= headerLen ? _strdup(pExtOverlapped->buf.buf + headerLen) : new char{ '\0' }; // make sure always valid (if possibly empty) string
+                    auto msgStart = pExtOverlapped->buf.buf + headerLen; // always ok. if we end up in bit of memory that is null, strdup in message constructor will simply give us an empty string
 
                     // adds to output queue or takes indicated action 
                     switch (action)
@@ -482,10 +482,10 @@ unsigned int UDPMultiCast::threadFunction()
                         PostQueuedCompletionStatus(_hIOCP, 0, 0, 0);
                         break;
                     case MsgType::data:
-                        _receivedData.enqueue(message(senderIP,msg,receiveTimeStamp));
+                        _receivedData.enqueue(message(senderIP,msgStart,receiveTimeStamp));
                         break;
                     case MsgType::command:
-                        _receivedCommands.enqueue(message(senderIP,msg,receiveTimeStamp));
+                        _receivedCommands.enqueue(message(senderIP,msgStart,receiveTimeStamp));
 #ifdef HAS_SMI_INTEGRATION
                         // send command directly to file so that we know as precisely (and with as low latency) as possible when it arrived
                         // this can be used for sync between pairs of systems
@@ -536,7 +536,7 @@ MsgType UDPMultiCast::processMsg(const char *msg_, size_t *headerLen_, size_t *m
         *headerLen_ = commaPos - msg_ + 1;
     // take copy of header
     char *header = new char[*headerLen_] {0};	// as headerLen_ includes comma, we've got space for null terminator
-    memcpy(header, msg_, *headerLen_ - 1);	// -1 is safe as we're pointing to idx 1 at minimum
+    memcpy(header, msg_, *headerLen_ - 1);	    // -1 is safe as we're pointing to idx 1 at minimum
 
     // switchyard using constexpr cheapCrappyHash to hash switch values to integrals
     // cheapCrappyHash is crappy because many collisions are possible and long strings don't fit in the returned integer (overflow!).

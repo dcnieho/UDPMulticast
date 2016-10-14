@@ -25,9 +25,10 @@ public:
 #ifdef IP_ADDR_AS_STR
     static_assert(false,"to implement");
 #else
+    // takes copy of char array input with _strdup()
     message(unsigned char ip_, char* text_, int64_t timeStamp_) :
         ip(ip_),
-        text({text_,std::free}),
+        text({ _strdup(text_),std::free}),
         timeStamp(timeStamp_)
     {}
 #endif
@@ -49,6 +50,11 @@ public:
         return timeStamp == b.timeStamp && !strcmp(text.get(), b.text.get()) && ip==b.ip;           // strcmp outputs 0 when inputs identical
 #endif
     };
+
+    message copy()
+    {
+        return message(ip,text.get(),timeStamp);
+    }
 
     // member variables
     std::unique_ptr<char, decltype(std::free)*> text;
