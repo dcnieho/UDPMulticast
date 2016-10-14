@@ -51,6 +51,7 @@ public:
 #endif
     };
 
+    // make deep copy of message. leaves original intact
     message copy()
     {
         return message(ip,text.get(),timeStamp);
