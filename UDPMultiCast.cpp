@@ -179,15 +179,18 @@ void UDPMultiCast::send(const std::string msg_)
     //cout << "sending:  \"" << _sendOverlapped.buf.buf << "\"" << endl;
 
     sendInternal(sendOverlapped);
+    // sendInternal goes so fast, despite being asynchronous (according to testing) that
+    // memory for the message can be deallocated by the time we print to the SMI file below.
+    // Ergo: do NOT use sendOverlapped->buf after this point
 
 #ifdef HAS_SMI_INTEGRATION
     // send command directly to file so that we know as precisely (and with as low latency) as possible when it arrived
     // this can be used for sync between pairs of systems
     size_t headerLen_, msgLen_;
-    if (MsgType::command == UDPMultiCast::processMsg(sendOverlapped->buf.buf, &headerLen_, &msgLen_))
+    if (MsgType::command == UDPMultiCast::processMsg(msg_.c_str(), &headerLen_, &msgLen_))
     {
         char buf[256];
-        snprintf(buf, sizeof(buf), "send: %s", sendOverlapped->buf.buf);
+        snprintf(buf, sizeof(buf), "send: %s", msg_.c_str());
         iV_SendImageMessage(buf);
     }
 #endif
