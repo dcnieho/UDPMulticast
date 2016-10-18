@@ -212,7 +212,7 @@ classdef UDPClient < handle
             % parse into {ip, timestamps, message}
             cmds   = cell(length(rawCmd),3);
             for p=1:length(rawCmd)
-                rawCmd(p).text
+                fprintf('%d: %s\n',rawCmd(p).ip,rawCmd(p).text);
                 cmds{p,1} = rawCmd(p).ip;
                 % moet los, anders krijg je doubles ookal zeg je %*f
                 % eerst de timestamps
