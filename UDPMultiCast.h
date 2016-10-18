@@ -19,7 +19,7 @@ public:
     void send(const std::string msg_);
     // check if receiver threads are still running. They may close when an exit message is received
     // function returns how many threads are running
-    int  checkReceiverThreads();
+    int checkReceiverThreads();
 
     // get the data and command messages received since the last call to this function
     // these are distinguished by putting dat or cmd in front of each message
@@ -95,18 +95,12 @@ private:
     std::string _groupAddress = "224.0.0.9";
     BOOL _loopBack = FALSE;
 
-    // SMI data read integration
+    // SMI data sending integration
 #ifdef HAS_SMI_INTEGRATION
 public:
     void startSMIDataSender(bool needConnect = false);
     void removeSMIDataSender();
 private:
     bool _smiDataSenderStarted = false;
-#endif // DEBUG
-
+#endif
 };
-// callback must be a free function
-#ifdef HAS_SMI_INTEGRATION
-#include "iViewXAPI.h"
-int __stdcall SMISampleCallback(SampleStruct sampleData);
-#endif // DEBUG

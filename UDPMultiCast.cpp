@@ -8,6 +8,11 @@
 #include "utils.h"
 #include "git_refid.h"
 
+
+#ifdef HAS_SMI_INTEGRATION
+#   include "iViewXAPI.h"
+#endif
+
 #include <iostream>
 #include <process.h>
 #include <cstring>
@@ -598,8 +603,10 @@ void UDPMultiCast::leaveMultiCast()
 }
 
 #ifdef HAS_SMI_INTEGRATION
+// callback must be a free function
 namespace {
     UDPMultiCast* classPtr = nullptr;
+    int __stdcall SMISampleCallback(SampleStruct sampleData);
 }
 void UDPMultiCast::startSMIDataSender(bool needConnect /*= false*/)
 {
