@@ -158,6 +158,7 @@ void UDPMultiCast::deInit()
     // free memory
     delete[] _pExtOverlappedArray;
     VirtualFree(_pReceiveBuffers, 0, MEM_RELEASE);
+    VirtualFree(_pAddrBuffers, 0, MEM_RELEASE);
 
     _initialized = false;
 }
