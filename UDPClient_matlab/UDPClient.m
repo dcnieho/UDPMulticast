@@ -216,6 +216,10 @@ classdef UDPClient < handle
             % set to 0 to disable completely
             this.debugLevel = debugLevel;
         end
+        function clearCommandBuffer(this)
+            this.parsedCommandBuffer = {};
+            this.getCommands(); % make sure we also clear the C++ buffer by requesting and discarding commands in there
+        end
     end
     
     methods (Access = private, Hidden = true)
