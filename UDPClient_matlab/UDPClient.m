@@ -4,9 +4,10 @@ classdef UDPClient < handle
     properties (Access = private, Hidden = true)
         objectHandle; % Handle to the underlying C++ class instance
         computerFilter = [];
-        hasSMIIntegration;
+        debugLevel = 0;
         
         parsedCommandBuffer = {};
+        hasSMIIntegration;
     end
     methods
         %% Constructor - Create a new C++ class instance 
@@ -36,6 +37,9 @@ classdef UDPClient < handle
                 varargin(1) = [];
             else
                 nSend = 1;
+            end
+            if bitand(this.debugLevel,2)
+                fprintf('sent: %s\n',varargin{1});
             end
             % send message
             for p=1:nSend
@@ -97,6 +101,7 @@ classdef UDPClient < handle
                 data{qIp,3}(end+1,:) = gazeData;  % leftX, leftY, rightX, rightY
             end
         end
+        
         % get cmds, one at a time, filtered and parsed
         function cmd = getSingleCommand(this, computers)
             cmd = [];
@@ -203,6 +208,14 @@ classdef UDPClient < handle
             this.computerFilter = filter;
             UDPClient_matlab('setComputerFilter', this.objectHandle, filter);
         end
+        function setDebugLevel(this, debugLevel)
+            % sets wanted debug output (each bit sets a different
+            % functionality, add together to specify which you want):
+            % 1: print received commands
+            % 2: print sent commands
+            % set to 0 to disable completely
+            this.debugLevel = debugLevel;
+        end
     end
     
     methods (Access = private, Hidden = true)
@@ -212,7 +225,9 @@ classdef UDPClient < handle
             % parse into {ip, timestamps, message}
             cmds   = cell(length(rawCmd),3);
             for p=1:length(rawCmd)
-                fprintf('%d: %s\n',rawCmd(p).ip,rawCmd(p).text);
+                if bitand(this.debugLevel,1)
+                    fprintf('received from %d: %s\n',rawCmd(p).ip,rawCmd(p).text);
+                end
                 cmds{p,1} = rawCmd(p).ip;
                 % moet los, anders krijg je doubles ookal zeg je %*f
                 % eerst de timestamps
