@@ -632,7 +632,13 @@ void UDPMultiCast::leaveMultiCast()
 // callback must be a free function
 namespace {
     UDPMultiCast* classPtr = nullptr;
-    int __stdcall SMISampleCallback(SampleStruct sampleData);
+    int __stdcall SMISampleCallback(SampleStruct sampleData)
+    {
+        char buf[128] = { '\0' };
+        sprintf_s(buf, "dat,%lld,%.2f,%.2f,%.2f,%.2f", sampleData.timestamp, sampleData.leftEye.gazeX, sampleData.leftEye.gazeY, sampleData.rightEye.gazeX, sampleData.rightEye.gazeY);
+        classPtr->sendWithTimeStamp(buf);
+        return 1;
+    }
 }
 void UDPMultiCast::startSMIDataSender(bool needConnect /*= false*/)
 {
@@ -646,11 +652,4 @@ void UDPMultiCast::removeSMIDataSender()
     iV_SetSampleCallback(nullptr);
 }
 
-int __stdcall SMISampleCallback(SampleStruct sampleData)
-{
-    char buf[128] = { '\0' };
-    sprintf_s(buf, "dat,%lld,%.2f,%.2f,%.2f,%.2f", sampleData.timestamp, sampleData.leftEye.gazeX, sampleData.leftEye.gazeY, sampleData.rightEye.gazeX, sampleData.rightEye.gazeY);
-    classPtr->sendWithTimeStamp(buf);
-    return 1;
-}
 #endif
