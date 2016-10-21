@@ -304,13 +304,19 @@ void UDPMultiCast::setComputerFilter(double* computerFilter_, size_t numElements
 
 void UDPMultiCast::setGroupAddress(const std::string& groupAddress_)
 {
-    // leave old group, if any
-    leaveMultiCast();
     // set new group address and join
     _groupAddress = groupAddress_;
-    setupAndJoinMultiCast();
-    // setup loopback for new group
-    setupLoopBack(_loopBack);
+
+    // if already inited, leave the old group and join the new one
+    if (_initialized)
+    {
+        // leave old group
+        leaveMultiCast();
+        // join new group
+        setupAndJoinMultiCast();
+        // setup loopback for new group
+        setupLoopBack(_loopBack);
+    }
 }
 
 void UDPMultiCast::setPort(const unsigned short& port_)
