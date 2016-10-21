@@ -128,6 +128,13 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         // Call the method
         plhs[0] = mxCreateLogicalScalar(!!UDPinstance->getLoopBack());
         return;
+    case ct::crc32("getReuseSocket"):
+        // Check parameters
+        if (nlhs < 1 || nrhs < 2)
+            mexErrMsgTxt("getReuseSocket: Unexpected arguments.");
+        // Call the method
+        plhs[0] = mxCreateLogicalScalar(!!UDPinstance->getReuseSocket());
+        return;
     case ct::crc32("setUseWTP"):
     {
         // Check parameters
@@ -174,6 +181,22 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
             loopback = mxIsLogicalScalarTrue(prhs[2]);
         // Call the method
         UDPinstance->setLoopBack(loopback);
+        return;
+    }
+    case ct::crc32("setReuseSocket"):
+    {
+        // Check parameters
+        if (nlhs < 0 || nrhs < 3)
+            mexErrMsgTxt("setReuseSocket: Expected loopback input.");
+        if (!(mxIsDouble(prhs[2]) && !mxIsComplex(prhs[2]) && mxIsScalar(prhs[2])) && !mxIsLogicalScalar(prhs[2]))
+            mexErrMsgTxt("setLoopBack: Expected argument to be a logical scalar.");
+        BOOL reuseSocket;
+        if (mxIsDouble(prhs[2]))
+            reuseSocket = !!mxGetScalar(prhs[2]);
+        else
+            reuseSocket = mxIsLogicalScalarTrue(prhs[2]);
+        // Call the method
+        UDPinstance->setReuseSocket(reuseSocket);
         return;
     }
     case ct::crc32("getGroupAddress"):

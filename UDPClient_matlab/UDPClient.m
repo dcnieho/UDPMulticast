@@ -149,6 +149,12 @@ classdef UDPClient < handle
         function setLoopBack(this, varargin)
             UDPClient_matlab('setLoopBack', this.objectHandle, varargin{:});
         end
+        function reuseSocket = getReuseSocket(this)
+            reuseSocket = UDPClient_matlab('getReuseSocket', this.objectHandle);
+        end
+        function setReuseSocket(this, varargin)
+            UDPClient_matlab('setReuseSocket', this.objectHandle, varargin{:});
+        end
         function groupAddress = getGroupAddress(this)
             groupAddress = UDPClient_matlab('getGroupAddress', this.objectHandle);
         end
