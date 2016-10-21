@@ -33,6 +33,8 @@ public:
     void setMaxClockRes(bool setMaxClockRes_);
     BOOL getLoopBack() const { return _loopBack; }
     void setLoopBack(const BOOL& loopBack_);
+    BOOL getReuseSocket() const { return _reuseSocket; }
+    void setReuseSocket(const BOOL& value_);
     std::string getGroupAddress() const { return _groupAddress; }
     void setGroupAddress(const std::string& groupAddress_);
     // for these, the setters can only be called before init is called
@@ -94,6 +96,7 @@ private:
     // more prefs, these can be changed after init
     std::string _groupAddress = "224.0.0.9";
     BOOL _loopBack = FALSE;
+    BOOL _reuseSocket = FALSE;
 
     // SMI data sending integration
 #ifdef HAS_SMI_INTEGRATION

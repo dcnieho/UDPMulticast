@@ -45,12 +45,23 @@ void UDPMultiCast::init()
     }
 
     // setup socket
-    // TODO: read and understand: http://stackoverflow.com/questions/10692956/what-does-it-mean-to-bind-a-multicast-udp-socket
-    // also, for a client it is recommended by the MSDN docs (without given reason) to not bind but WSAJoinLeaf
     sockaddr_in addr;
     addr.sin_family = AF_INET;
     addr.sin_port = htons(_port);
     addr.sin_addr.s_addr = INADDR_ANY;	// INADDR_ANY or use inet_addr("127.0.0.1") to set
+
+    // if wanted, set the socket up for reuse of the port, so multiple applications can access data incoming over the same port
+    // with winsocks, for a multicast socket, all sockets opened on the same port with SO_REUSEADDR receive all incoming packets
+    if (_reuseSocket)
+    {
+        if (SOCKET_ERROR == ::setsockopt(_socket, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<const char*>(&_reuseSocket), sizeof(_reuseSocket)))
+        {
+            ErrorExit("setsockopt SO_REUSEADDR");
+        }
+    }
+
+    // TODO: read and understand: http://stackoverflow.com/questions/10692956/what-does-it-mean-to-bind-a-multicast-udp-socket
+    // also, for a client it is recommended by the MSDN docs (without given reason) to not bind but WSAJoinLeaf
     if (SOCKET_ERROR == ::bind(_socket, reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr)))
     {
         ErrorExit("bind");
@@ -265,6 +276,14 @@ void UDPMultiCast::setLoopBack(const BOOL& loopBack_)
         setupLoopBack(loopBack_);
     }
     _loopBack = loopBack_;
+}
+
+void UDPMultiCast::setReuseSocket(const BOOL& value_) 
+{ 
+    if (_initialized)
+        ErrorMsgExit("cannot reuse socket when already initialized");
+
+    _reuseSocket = value_;
 }
 
 void UDPMultiCast::setComputerFilter(double* computerFilter_, size_t numElements_)
