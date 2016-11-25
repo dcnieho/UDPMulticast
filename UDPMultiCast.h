@@ -101,9 +101,13 @@ private:
     // SMI data sending integration
 #ifdef HAS_SMI_INTEGRATION
 public:
+	bool hasSMIIntegration() {return true;}
     void startSMIDataSender(bool needConnect = false);
     void removeSMIDataSender();
 private:
     bool _smiDataSenderStarted = false;
+#else
+public:
+	bool hasSMIIntegration() {return false;}
 #endif
 };

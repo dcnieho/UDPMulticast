@@ -28,7 +28,7 @@ public:
     // takes copy of char array input with _strdup()
     message(unsigned char ip_, char* text_, int64_t timeStamp_) :
         ip(ip_),
-        text({ _strdup(text_),std::free}),
+        text({_strdup(text_),std::free}),
         timeStamp(timeStamp_)
     {}
 #endif

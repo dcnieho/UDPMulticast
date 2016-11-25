@@ -299,24 +299,19 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         // Call the method
         plhs[0] = mxCreateNumericMatrix(1, 1, mxINT64_CLASS, mxREAL);
         *static_cast<long long*>(mxGetData(plhs[0])) = timeUtils::getTimeStamp();
-        return;
+		return;
+	case ct::crc32("hasSMIIntegration"):
+		plhs[0] = mxCreateNumericMatrix(1, 1, mxLOGICAL_CLASS, mxREAL);
+		*static_cast<bool*>(mxGetData(plhs[0])) = UDPinstance->hasSMIIntegration();
+		return;
 #ifdef HAS_SMI_INTEGRATION
-    case ct::crc32("hasSMIIntegration"):
-        plhs[0] = mxCreateNumericMatrix(1, 1, mxLOGICAL_CLASS, mxREAL);
-        *static_cast<bool*>(mxGetData(plhs[0])) = true;
-        return;
     case ct::crc32("startSMIDataSender"):
         UDPinstance->startSMIDataSender();
         return;
     case ct::crc32("removeSMIDataSender"):
         UDPinstance->removeSMIDataSender();
         return;
-#else
-    case ct::crc32("hasSMIIntegration"):
-        plhs[0] = mxCreateNumericMatrix(1, 1, mxLOGICAL_CLASS, mxREAL);
-        *static_cast<bool*>(mxGetData(plhs[0])) = false;
-        return;
-#endif
+#endif // HAS_SMI_INTEGRATION
     default:
         // Got here, so command not recognized
         mexErrMsgTxt("Command not recognized.");
