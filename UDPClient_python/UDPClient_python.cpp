@@ -1,4 +1,5 @@
 #include "../UDPMultiCast.h"
+#include "../utils.h"
 
 #include <iostream>
 #include <string>
@@ -8,33 +9,51 @@
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 using namespace boost::python;
 
+// TODO: add pure python functions as per
+// http://www.boost.org/doc/libs/1_62_0/libs/python/doc/html/tutorial/tutorial/techniques.html
+// e.g., for debug, getting single commands, etc
 
+struct theMsgConverter {
+	theMsgConverter() {
+		auto collections = import("collections");
+		auto namedtuple = collections.attr("namedtuple");
+		list fields;
+		fields.append("text");
+		fields.append("timestamp");
+		fields.append("ip");
+		msgTuple = namedtuple("message", fields);
+	}
+
+	api::object msgTuple;
+
+	list getMessages(const std::vector<message>& msgs_) {
+		list result;
+		for (auto& msg : msgs_)
+#ifdef IP_ADDR_AS_STR
+			// boost.python doesn't do plain arrays, convert to string for an easy fix
+			result.append(msgTuple(msg.text.get(), msg.timeStamp, std::string(msg.ip)));
+#else
+			result.append(msgTuple(msg.text.get(), msg.timeStamp, msg.ip));
+#endif
+		return result;
+	}
+};
+theMsgConverter convertMsgs;
+
+
+list getData(UDPMultiCast& udp_) {
+	return convertMsgs.getMessages(udp_.getData());
+}
+list getCommands(UDPMultiCast& udp_) {
+	return convertMsgs.getMessages(udp_.getCommands());
+}
+
+// tell python that UDPMultiCast::sendWithTimeStamp last argument is optional
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(send_overloads, UDPMultiCast::sendWithTimeStamp, 1, 2);
+// start module scope
 BOOST_PYTHON_MODULE(UDPClient_python)
 {
-    // alternative for getData etc would be to use:
-    // http://stackoverflow.com/questions/13675409/creating-python-collections-namedtuple-from-c-using-boostpython
-    // maybe we can do a bit better when we learn from <boost/python/tuple.hpp>
-    // may need this:
-    // http://stackoverflow.com/questions/2135457/how-to-write-a-wrapper-over-functions-and-member-functions-that-executes-some-co
-    // make a second getdata function (getDataNTL for named tuple list). Test which one is faster so we have a recommended function,
-    // but keep both. preferred is simply called getData, non-preferred getDataNTL or getDataSL.
-
-    // need to expose our message struct (NB: boost.python doesn't do plain arrays, convert to string for an easy fix)
-    class_<message>("message")
-        .add_property("text", static_cast<std::string(*)(const message&)>([](const message& m) {return std::string(m.text); }))	// casting to function pointer the ugly way as unary plus does not seems to work with VS2015
-        .add_property("timeStamp", &message::timeStamp)
-#ifdef IP_ADDR_AS_STR
-        .add_property("ip", static_cast<std::string(*)(const message&)>([](const message& m) {return std::string(m.ip); }));
-#else
-        .add_property("ip", &message::ip);
-#endif
-
-    // and a vector of messages
-    class_<std::vector<message>>("messageList")
-        .def(vector_indexing_suite<std::vector<message>>());
-
-    class_<UDPMultiCast, boost::noncopyable>("UDPClient", init<>())
+	class_<UDPMultiCast, boost::noncopyable>("UDPClient", init<>())
         .def("init", &UDPMultiCast::init)
         .def("deInit", &UDPMultiCast::deInit)
         .def("sendWithTimeStamp", &UDPMultiCast::sendWithTimeStamp, send_overloads())
@@ -42,21 +61,31 @@ BOOST_PYTHON_MODULE(UDPClient_python)
         .def("checkReceiverThreads",&UDPMultiCast::checkReceiverThreads)
 
         // get the data and command messages received since the last call to this function
-        .def("getData", &UDPMultiCast::getData)
-        .def("getCommands", &UDPMultiCast::getCommands)
+        .def("getData", getData)
+        .def("getCommands", getCommands)
 
-        // getters and setters
-        // these can be called at any time
+		// getters and setters
+		.add_property("loopBack", &UDPMultiCast::getLoopBack, &UDPMultiCast::setLoopBack)
+		.add_property("reuseSocket", &UDPMultiCast::getReuseSocket, &UDPMultiCast::setReuseSocket)
         .def("setUseWTP", &UDPMultiCast::setUseWTP)
         .def("setMaxClockRes", &UDPMultiCast::setMaxClockRes)
-        .add_property("loopBack", &UDPMultiCast::getLoopBack, &UDPMultiCast::setLoopBack)
         .add_property("groupAddress", &UDPMultiCast::getGroupAddress, &UDPMultiCast::setGroupAddress)
-        // these can only be called before init is called
         .add_property("port", &UDPMultiCast::getPort, &UDPMultiCast::setPort)
         .add_property("bufferSize", &UDPMultiCast::getBufferSize, &UDPMultiCast::setBufferSize)
         .add_property("numQueuedReceives", &UDPMultiCast::getNumQueuedReceives, &UDPMultiCast::setNumQueuedReceives)
-        .add_property("numReceiverThreads", &UDPMultiCast::getNumReceiverThreads, &UDPMultiCast::setNumReceiverThreads)
+		.add_property("numReceiverThreads", &UDPMultiCast::getNumReceiverThreads, &UDPMultiCast::setNumReceiverThreads)
+		.def("setComputerFilter", &UDPMultiCast::setComputerFilter)
+#ifdef HAS_SMI_INTEGRATION
+		.def("hasSMIIntegration", &UDPMultiCast::hasSMIIntegration)
+		.def("startSMIDataSender", &UDPMultiCast::startSMIDataSender)
+		.def("removeSMIDataSender", &UDPMultiCast::removeSMIDataSender)
+#else // HAS_SMI_INTEGRATION
+		.def("hasSMIIntegration", &UDPMultiCast::hasSMIIntegration)
+#endif // HAS_SMI_INTEGRATION
         ;
+
+	// free functions
+	def("getCurrentTime", &timeUtils::getTimeStamp);
 }
 
 void DoExitWithMsg(std::string errMsg_)

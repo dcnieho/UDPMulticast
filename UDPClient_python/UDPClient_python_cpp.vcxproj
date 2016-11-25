@@ -31,7 +31,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -81,6 +81,12 @@
     <TargetName>UDPClient_python</TargetName>
     <TargetExt>.pyd</TargetExt>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>.\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <TargetName>UDPClient_python</TargetName>
+    <TargetExt>.pyd</TargetExt>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -90,7 +96,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\Diederick\Anaconda\libs;C:\dat\C\boost\lib\$(Platform)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\Diederick\Anaconda\libs;..\..\Dependency\boost\lib\$(Platform)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -99,14 +105,14 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\dat\C\Dependency\boost;C:\Users\Diederick\Anaconda2\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\Dependency\boost;C:\Users\Diederick\Anaconda2\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\Diederick\Anaconda2\libs;C:\dat\C\Dependency\boost\stage\$(Platform)\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\Diederick\Anaconda2\libs;..\..\Dependency\boost\stage\$(Platform)\lib</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;..\$(IntDir)UDPClient.lib;C:\dat\C\Dependency\windowstimestampproject\lib\$(Configuration)\$(Platform)\G_Lib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;..\$(IntDir)UDPClient.lib;..\..\Dependency\windowstimestampproject\lib\$(Configuration)\$(Platform)\G_Lib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -116,11 +122,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>..\..\Dependency\boost;C:\Users\Diederick\Anaconda\include</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;..\$(Configuration)\UDPClient.lib;..\..\Dependency\windowstimestampproject\lib\$(Configuration)\$(Platform)\G_Lib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Diederick\Anaconda\libs;..\..\Dependency\boost\stage\$(Platform)\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -130,15 +139,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\dat\C\Dependency\boost;C:\Users\Diederick\Anaconda2\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\Dependency\boost;C:\Users\Diederick\Anaconda\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\Users\Diederick\Anaconda2\libs;C:\dat\C\Dependency\boost\stage\$(Platform)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;..\$(IntDir)UDPClient.lib;C:\dat\C\Dependency\windowstimestampproject\lib\$(Configuration)\$(Platform)\G_Lib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Diederick\Anaconda\libs;..\..\Dependency\boost\stage\$(Platform)\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;..\$(IntDir)UDPClient.lib;..\..\Dependency\windowstimestampproject\lib\$(Configuration)\$(Platform)\G_Lib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
