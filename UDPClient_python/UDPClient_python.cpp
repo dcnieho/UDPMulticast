@@ -14,7 +14,7 @@ using namespace boost::python;
 // e.g., for debug, getting single commands, etc
 
 struct theMsgConverter {
-	theMsgConverter() {
+	void init() {
 		auto collections = import("collections");
 		auto namedtuple = collections.attr("namedtuple");
 		list fields;
@@ -24,16 +24,22 @@ struct theMsgConverter {
 		msgTuple = namedtuple("message", fields);
 	}
 
+	bool inited = false;
 	api::object msgTuple;
 
 	list getMessages(const std::vector<message>& msgs_) {
+		if (!inited)
+		{
+			init();
+			inited = true;
+		}
 		list result;
 		for (auto& msg : msgs_)
-#ifdef IP_ADDR_AS_STR
 			// boost.python doesn't do plain arrays, convert to string for an easy fix
-			result.append(msgTuple(msg.text.get(), msg.timeStamp, std::string(msg.ip)));
+#ifdef IP_ADDR_AS_STR
+			result.append(msgTuple(std::string(msg.text.get()), msg.timeStamp, std::string(msg.ip)));
 #else
-			result.append(msgTuple(msg.text.get(), msg.timeStamp, msg.ip));
+			result.append(msgTuple(std::string(msg.text.get()), msg.timeStamp, msg.ip));
 #endif
 		return result;
 	}
