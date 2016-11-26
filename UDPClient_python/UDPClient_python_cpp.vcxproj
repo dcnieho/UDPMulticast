@@ -77,7 +77,7 @@
     <OutDir>.\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>.\</OutDir>
+    <OutDir>.\UDPClient\</OutDir>
     <TargetName>UDPClient_python</TargetName>
     <TargetExt>.pyd</TargetExt>
   </PropertyGroup>

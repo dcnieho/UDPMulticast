@@ -1,6 +1,6 @@
-﻿import UDPClient_python
+﻿import UDPClient
 
-udp = UDPClient_python.UDPClient()
+udp = UDPClient.UDPClient()
 udp.port = 4444;
 udp.init();
 udp.loopBack = True;

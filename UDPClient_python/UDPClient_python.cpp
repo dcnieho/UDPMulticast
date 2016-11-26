@@ -9,9 +9,6 @@
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 using namespace boost::python;
 
-// TODO: add pure python functions as per
-// http://www.boost.org/doc/libs/1_62_0/libs/python/doc/html/tutorial/tutorial/techniques.html
-// e.g., for debug, getting single commands, etc
 
 struct theMsgConverter {
 	void init() {
