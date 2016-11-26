@@ -121,13 +121,69 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         // Call the method
         plhs[0] = msgVectorToMatlab(UDPinstance->getCommands());
         return;
+
+	case ct::crc32("getGitRefID"):
+		// Check parameters
+		if (nlhs < 1 || nrhs < 2)
+			mexErrMsgTxt("getGitRefID: Unexpected arguments.");
+		// Call the method
+		plhs[0] = mxCreateString(UDPinstance->getGitRefID().c_str());
+		return;
+	case ct::crc32("setUseWTP"):
+	{
+		// Check parameters
+		if (nlhs < 0 || nrhs < 3)
+			mexErrMsgTxt("setUseWTP: Expected loopback input.");
+		if (!(mxIsDouble(prhs[2]) && !mxIsComplex(prhs[2]) && mxIsScalar(prhs[2])) && !mxIsLogicalScalar(prhs[2]))
+			mexErrMsgTxt("setUseWTP: Expected argument to be a logical scalar.");
+		bool useWTP;
+		if (mxIsDouble(prhs[2]))
+			useWTP = !!mxGetScalar(prhs[2]);
+		else
+			useWTP = mxIsLogicalScalarTrue(prhs[2]);
+		// Call the method
+		UDPinstance->setUseWTP(useWTP);
+		return;
+	}
+	case ct::crc32("setMaxClockRes"):
+	{
+		// Check parameters
+		if (nlhs < 0 || nrhs < 3)
+			mexErrMsgTxt("setMaxClockRes: Expected loopback input.");
+		if (!(mxIsDouble(prhs[2]) && !mxIsComplex(prhs[2]) && mxIsScalar(prhs[2])) && !mxIsLogicalScalar(prhs[2]))
+			mexErrMsgTxt("setMaxClockRes: Expected argument to be a logical scalar.");
+		bool setMaxClockRes;
+		if (mxIsDouble(prhs[2]))
+			setMaxClockRes = !!mxGetScalar(prhs[2]);
+		else
+			setMaxClockRes = mxIsLogicalScalarTrue(prhs[2]);
+		// Call the method
+		UDPinstance->setMaxClockRes(setMaxClockRes);
+		return;
+	}
     case ct::crc32("getLoopBack"):
         // Check parameters
         if (nlhs < 1 || nrhs < 2)
             mexErrMsgTxt("getLoopBack: Unexpected arguments.");
         // Call the method
         plhs[0] = mxCreateLogicalScalar(!!UDPinstance->getLoopBack());
-        return;
+		return;
+	case ct::crc32("setLoopBack"):
+	{
+		// Check parameters
+		if (nlhs < 0 || nrhs < 3)
+			mexErrMsgTxt("setLoopBack: Expected loopback input.");
+		if (!(mxIsDouble(prhs[2]) && !mxIsComplex(prhs[2]) && mxIsScalar(prhs[2])) && !mxIsLogicalScalar(prhs[2]))
+			mexErrMsgTxt("setLoopBack: Expected argument to be a logical scalar.");
+		BOOL loopback;
+		if (mxIsDouble(prhs[2]))
+			loopback = !!mxGetScalar(prhs[2]);
+		else
+			loopback = mxIsLogicalScalarTrue(prhs[2]);
+		// Call the method
+		UDPinstance->setLoopBack(loopback);
+		return;
+	}
     case ct::crc32("getReuseSocket"):
         // Check parameters
         if (nlhs < 1 || nrhs < 2)
@@ -135,54 +191,6 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         // Call the method
         plhs[0] = mxCreateLogicalScalar(!!UDPinstance->getReuseSocket());
         return;
-    case ct::crc32("setUseWTP"):
-    {
-        // Check parameters
-        if (nlhs < 0 || nrhs < 3)
-            mexErrMsgTxt("setUseWTP: Expected loopback input.");
-        if (!(mxIsDouble(prhs[2]) && !mxIsComplex(prhs[2]) && mxIsScalar(prhs[2])) && !mxIsLogicalScalar(prhs[2]))
-            mexErrMsgTxt("setUseWTP: Expected argument to be a logical scalar.");
-        bool useWTP;
-        if (mxIsDouble(prhs[2]))
-            useWTP = !!mxGetScalar(prhs[2]);
-        else
-            useWTP = mxIsLogicalScalarTrue(prhs[2]);
-        // Call the method
-        UDPinstance->setUseWTP(useWTP);
-        return;
-    }
-    case ct::crc32("setMaxClockRes"):
-    {
-        // Check parameters
-        if (nlhs < 0 || nrhs < 3)
-            mexErrMsgTxt("setMaxClockRes: Expected loopback input.");
-        if (!(mxIsDouble(prhs[2]) && !mxIsComplex(prhs[2]) && mxIsScalar(prhs[2])) && !mxIsLogicalScalar(prhs[2]))
-            mexErrMsgTxt("setMaxClockRes: Expected argument to be a logical scalar.");
-        bool setMaxClockRes;
-        if (mxIsDouble(prhs[2]))
-            setMaxClockRes = !!mxGetScalar(prhs[2]);
-        else
-            setMaxClockRes = mxIsLogicalScalarTrue(prhs[2]);
-        // Call the method
-        UDPinstance->setMaxClockRes(setMaxClockRes);
-        return;
-    }
-    case ct::crc32("setLoopBack"):
-    {
-        // Check parameters
-        if (nlhs < 0 || nrhs < 3)
-            mexErrMsgTxt("setLoopBack: Expected loopback input.");
-        if (!(mxIsDouble(prhs[2]) && !mxIsComplex(prhs[2]) && mxIsScalar(prhs[2])) && !mxIsLogicalScalar(prhs[2]))
-            mexErrMsgTxt("setLoopBack: Expected argument to be a logical scalar.");
-        BOOL loopback;
-        if (mxIsDouble(prhs[2]))
-            loopback = !!mxGetScalar(prhs[2]);
-        else
-            loopback = mxIsLogicalScalarTrue(prhs[2]);
-        // Call the method
-        UDPinstance->setLoopBack(loopback);
-        return;
-    }
     case ct::crc32("setReuseSocket"):
     {
         // Check parameters

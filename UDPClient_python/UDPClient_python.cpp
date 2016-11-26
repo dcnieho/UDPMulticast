@@ -71,6 +71,7 @@ BOOST_PYTHON_MODULE(UDPClient_python)
         .def("getCommands", getCommands)
 
 		// getters and setters
+		.def("getGitRefID", &UDPMultiCast::getGitRefID)
         .def("setUseWTP", &UDPMultiCast::setUseWTP)
 		.def("setMaxClockRes", &UDPMultiCast::setMaxClockRes)
 		.add_property("loopBack", &UDPMultiCast::getLoopBack, &UDPMultiCast::setLoopBack)

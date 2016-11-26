@@ -137,6 +137,9 @@ classdef UDPClient < handle
         end
         
         % getters and setters
+        function gitRefID = getGitRefID(this)
+            gitRefID = UDPClient_matlab('getGitRefID', this.objectHandle);
+        end
         function setUseWTP(this, varargin)
             UDPClient_matlab('setUseWTP', this.objectHandle, varargin{:});
         end

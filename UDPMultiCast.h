@@ -42,9 +42,9 @@ public:
     void setPort(const unsigned short& port_);
     size_t getBufferSize() const { return _bufferSize; }
     void setBufferSize(const size_t& bufferSize_);
-    unsigned long getNumQueuedReceives() const { return _IOCPPendingReceives; };
+    unsigned long getNumQueuedReceives() const { return _IOCPPendingReceives; }
     void setNumQueuedReceives(const unsigned long& IOCPPendingReceives_);
-    unsigned long getNumReceiverThreads() const { return _numIOCPThreads; };
+    unsigned long getNumReceiverThreads() const { return _numIOCPThreads; }
     void setNumReceiverThreads(const unsigned long& numIOCPThreads_);
     void setComputerFilter(double* computerFilter_, size_t numElements_);
 

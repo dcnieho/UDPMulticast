@@ -1,12 +1,15 @@
 % testing MATLAB class wrapper to underlying C++ class UDPClient
 
 udp = UDPClient();
+fprintf('build from git revision ID %s\n',udp.getGitRefID());
 udp.setPort(4444);
 udp.getGroupAddress()
-udp.setUseWTP(true);
+udp.setUseWTP(false);
 udp.setMaxClockRes(true);
 udp.init();
 udp.setLoopBack(true);
+
+udp.getCurrentTime();   % warmup timestamper
 
 % send a bunch of messages
 for i=1:2048
