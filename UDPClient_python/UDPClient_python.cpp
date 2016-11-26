@@ -11,44 +11,44 @@ using namespace boost::python;
 
 
 struct theMsgConverter {
-	void init() {
-		auto collections = import("collections");
-		auto namedtuple = collections.attr("namedtuple");
-		list fields;
-		fields.append("text");
-		fields.append("timestamp");
-		fields.append("ip");
-		msgTuple = namedtuple("message", fields);
-	}
+    void init() {
+        auto collections = import("collections");
+        auto namedtuple = collections.attr("namedtuple");
+        list fields;
+        fields.append("text");
+        fields.append("timestamp");
+        fields.append("ip");
+        msgTuple = namedtuple("message", fields);
+    }
 
-	bool inited = false;
-	api::object msgTuple;
+    bool inited = false;
+    api::object msgTuple;
 
-	list getMessages(const std::vector<message>& msgs_) {
-		if (!inited)
-		{
-			init();
-			inited = true;
-		}
-		list result;
-		for (auto& msg : msgs_)
-			// boost.python doesn't do plain arrays, convert to string for an easy fix
+    list getMessages(const std::vector<message>& msgs_) {
+        if (!inited)
+        {
+            init();
+            inited = true;
+        }
+        list result;
+        for (auto& msg : msgs_)
+            // boost.python doesn't do plain arrays, convert to string for an easy fix
 #ifdef IP_ADDR_AS_STR
-			result.append(msgTuple(std::string(msg.text.get()), msg.timeStamp, std::string(msg.ip)));
+            result.append(msgTuple(std::string(msg.text.get()), msg.timeStamp, std::string(msg.ip)));
 #else
-			result.append(msgTuple(std::string(msg.text.get()), msg.timeStamp, msg.ip));
+            result.append(msgTuple(std::string(msg.text.get()), msg.timeStamp, msg.ip));
 #endif
-		return result;
-	}
+        return result;
+    }
 };
 theMsgConverter convertMsgs;
 
 
 list getData(UDPMultiCast& udp_) {
-	return convertMsgs.getMessages(udp_.getData());
+    return convertMsgs.getMessages(udp_.getData());
 }
 list getCommands(UDPMultiCast& udp_) {
-	return convertMsgs.getMessages(udp_.getCommands());
+    return convertMsgs.getMessages(udp_.getCommands());
 }
 
 // tell boost.python about functions with optional arguments
@@ -59,7 +59,7 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(startSMIDataSender_overloads, UDPMultiCas
 // start module scope
 BOOST_PYTHON_MODULE(UDPClient_python)
 {
-	class_<UDPMultiCast, boost::noncopyable>("UDPClient", init<>())
+    class_<UDPMultiCast, boost::noncopyable>("UDPClient", init<>())
         .def("init", &UDPMultiCast::init)
         .def("deInit", &UDPMultiCast::deInit)
         .def("sendWithTimeStamp", &UDPMultiCast::sendWithTimeStamp, sendWithTimeStamp_overloads())
@@ -70,29 +70,29 @@ BOOST_PYTHON_MODULE(UDPClient_python)
         .def("getData", getData)
         .def("getCommands", getCommands)
 
-		// getters and setters
-		.def("getGitRefID", &UDPMultiCast::getGitRefID)
+        // getters and setters
+        .def("getGitRefID", &UDPMultiCast::getGitRefID)
         .def("setUseWTP", &UDPMultiCast::setUseWTP)
-		.def("setMaxClockRes", &UDPMultiCast::setMaxClockRes)
-		.add_property("loopBack", &UDPMultiCast::getLoopBack, &UDPMultiCast::setLoopBack)
-		.add_property("reuseSocket", &UDPMultiCast::getReuseSocket, &UDPMultiCast::setReuseSocket)
+        .def("setMaxClockRes", &UDPMultiCast::setMaxClockRes)
+        .add_property("loopBack", &UDPMultiCast::getLoopBack, &UDPMultiCast::setLoopBack)
+        .add_property("reuseSocket", &UDPMultiCast::getReuseSocket, &UDPMultiCast::setReuseSocket)
         .add_property("groupAddress", &UDPMultiCast::getGroupAddress, &UDPMultiCast::setGroupAddress)
         .add_property("port", &UDPMultiCast::getPort, &UDPMultiCast::setPort)
         .add_property("bufferSize", &UDPMultiCast::getBufferSize, &UDPMultiCast::setBufferSize)
         .add_property("numQueuedReceives", &UDPMultiCast::getNumQueuedReceives, &UDPMultiCast::setNumQueuedReceives)
-		.add_property("numReceiverThreads", &UDPMultiCast::getNumReceiverThreads, &UDPMultiCast::setNumReceiverThreads)
-		.def("setComputerFilter", &UDPMultiCast::setComputerFilter)
+        .add_property("numReceiverThreads", &UDPMultiCast::getNumReceiverThreads, &UDPMultiCast::setNumReceiverThreads)
+        .def("setComputerFilter", &UDPMultiCast::setComputerFilter)
 #ifdef HAS_SMI_INTEGRATION
-		.def("hasSMIIntegration", &UDPMultiCast::hasSMIIntegration)
-		.def("startSMIDataSender", &UDPMultiCast::startSMIDataSender, startSMIDataSender_overloads())
-		.def("removeSMIDataSender", &UDPMultiCast::removeSMIDataSender)
+        .def("hasSMIIntegration", &UDPMultiCast::hasSMIIntegration)
+        .def("startSMIDataSender", &UDPMultiCast::startSMIDataSender, startSMIDataSender_overloads())
+        .def("removeSMIDataSender", &UDPMultiCast::removeSMIDataSender)
 #else // HAS_SMI_INTEGRATION
-		.def("hasSMIIntegration", &UDPMultiCast::hasSMIIntegration)
+        .def("hasSMIIntegration", &UDPMultiCast::hasSMIIntegration)
 #endif // HAS_SMI_INTEGRATION
         ;
 
-	// free functions
-	def("getCurrentTime", &timeUtils::getTimeStamp);
+    // free functions
+    def("getCurrentTime", &timeUtils::getTimeStamp);
 }
 
 void DoExitWithMsg(std::string errMsg_)

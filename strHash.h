@@ -85,7 +85,3 @@ namespace ct {
 namespace rt {
     uint32_t crc32(const char * str, size_t len);
 }
-
-//uint32_t ctcrc32(const char *str, size_t len) {
-//	return detail::crc32<len - 2>(str) ^ 0xFFFFFFFF;
-//}
