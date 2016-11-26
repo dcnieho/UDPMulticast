@@ -1,4 +1,5 @@
 #include "../UDPMultiCast.h"
+#include "../utils.h"
 
 #include <string>
 #include <iostream>
@@ -7,9 +8,12 @@
 int _tmain(int argc, _TCHAR* argv[])
 {
     UDPMultiCast udp;
+    printf("build from git revision ID %s\n", udp.getGitRefID().c_str());
     udp.setPort(4444);
     udp.init();
     udp.setLoopBack(TRUE);
+
+    timeUtils::getTimeStamp();  // warmup timestamper
 
     // send a bunch of messages
     for (int i = 0; i < 2048; i++)

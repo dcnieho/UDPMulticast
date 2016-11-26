@@ -1,9 +1,13 @@
 ﻿import UDPClient
 
 udp = UDPClient.UDPClient()
+print "build from git revision ID " + udp.getGitRefID()
 udp.port = 4444;
 udp.init();
 udp.loopBack = True;
+
+UDPClient.getCurrentTime()    # warmup timestamper
+
 # send a bunch of messages
 for i in range(1, 2048):
     udp.sendWithTimeStamp('dat,1,crap',',');
