@@ -51,15 +51,18 @@ list getCommands(UDPMultiCast& udp_) {
 	return convertMsgs.getMessages(udp_.getCommands());
 }
 
-// tell python that UDPMultiCast::sendWithTimeStamp last argument is optional
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(send_overloads, UDPMultiCast::sendWithTimeStamp, 1, 2);
+// tell boost.python about functions with optional arguments
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(sendWithTimeStamp_overloads, UDPMultiCast::sendWithTimeStamp, 1, 2);
+#ifdef HAS_SMI_INTEGRATION
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(startSMIDataSender_overloads, UDPMultiCast::startSMIDataSender, 0, 1);
+#endif
 // start module scope
 BOOST_PYTHON_MODULE(UDPClient_python)
 {
 	class_<UDPMultiCast, boost::noncopyable>("UDPClient", init<>())
         .def("init", &UDPMultiCast::init)
         .def("deInit", &UDPMultiCast::deInit)
-        .def("sendWithTimeStamp", &UDPMultiCast::sendWithTimeStamp, send_overloads())
+        .def("sendWithTimeStamp", &UDPMultiCast::sendWithTimeStamp, sendWithTimeStamp_overloads())
         .def("send", &UDPMultiCast::send)
         .def("checkReceiverThreads",&UDPMultiCast::checkReceiverThreads)
 
@@ -68,10 +71,10 @@ BOOST_PYTHON_MODULE(UDPClient_python)
         .def("getCommands", getCommands)
 
 		// getters and setters
+        .def("setUseWTP", &UDPMultiCast::setUseWTP)
+		.def("setMaxClockRes", &UDPMultiCast::setMaxClockRes)
 		.add_property("loopBack", &UDPMultiCast::getLoopBack, &UDPMultiCast::setLoopBack)
 		.add_property("reuseSocket", &UDPMultiCast::getReuseSocket, &UDPMultiCast::setReuseSocket)
-        .def("setUseWTP", &UDPMultiCast::setUseWTP)
-        .def("setMaxClockRes", &UDPMultiCast::setMaxClockRes)
         .add_property("groupAddress", &UDPMultiCast::getGroupAddress, &UDPMultiCast::setGroupAddress)
         .add_property("port", &UDPMultiCast::getPort, &UDPMultiCast::setPort)
         .add_property("bufferSize", &UDPMultiCast::getBufferSize, &UDPMultiCast::setBufferSize)
@@ -80,7 +83,7 @@ BOOST_PYTHON_MODULE(UDPClient_python)
 		.def("setComputerFilter", &UDPMultiCast::setComputerFilter)
 #ifdef HAS_SMI_INTEGRATION
 		.def("hasSMIIntegration", &UDPMultiCast::hasSMIIntegration)
-		.def("startSMIDataSender", &UDPMultiCast::startSMIDataSender)
+		.def("startSMIDataSender", &UDPMultiCast::startSMIDataSender, startSMIDataSender_overloads())
 		.def("removeSMIDataSender", &UDPMultiCast::removeSMIDataSender)
 #else // HAS_SMI_INTEGRATION
 		.def("hasSMIIntegration", &UDPMultiCast::hasSMIIntegration)
