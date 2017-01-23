@@ -1,9 +1,10 @@
-#include "../UDPMultiCast.h"
-#include "../utils.h"
+#include "UDPMultiCast/UDPMultiCast.h"
+#include "UDPMultiCast/utils.h"
 
 #include <string>
 #include <iostream>
-#include "../strHash.h"
+
+#include "UDPMultiCast/strHash.h"
 
 int _tmain(int argc, _TCHAR* argv[])
 {

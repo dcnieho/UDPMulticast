@@ -1,6 +1,6 @@
 #pragma once
-#include "includes.h"
-#include "strHash.h"
+#include "UDPMultiCast/includes.h"
+#include "UDPMultiCast/strHash.h"
 
 #include <string>
 #include <sstream>

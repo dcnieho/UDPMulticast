@@ -1,5 +1,5 @@
-#include "../UDPMultiCast.h"
-#include "../utils.h"
+#include "UDPMultiCast/UDPMultiCast.h"
+#include "UDPMultiCast/utils.h"
 
 #include <iostream>
 #include <string>

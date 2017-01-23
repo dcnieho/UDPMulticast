@@ -3,9 +3,9 @@
 // the code handling IOCP in this implementation is based on the server presented here:
 // http://www.serverframework.com/asynchronousevents/2012/08/winsock-registered-io---traditional-multi-threaded-iocp-udp-example-server.html
 
-#include "UDPMultiCast.h"
+#include "UDPMultiCast/UDPMultiCast.h"
 
-#include "utils.h"
+#include "UDPMultiCast/utils.h"
 #include "git_refid.h"
 
 

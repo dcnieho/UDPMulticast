@@ -1,9 +1,9 @@
-#include "../UDPMultiCast.h"
+#include "UDPMultiCast/UDPMultiCast.h"
 #define DLL_EXPORT_SYM __declspec(dllexport) 
 #include "mex.h"
 #include "class_handle.hpp"
-#include "../strHash.h"
-#include "../utils.h"
+#include "UDPMultiCast/strHash.h"
+#include "UDPMultiCast/utils.h"
 
 #include <cwchar>
 #include <algorithm>

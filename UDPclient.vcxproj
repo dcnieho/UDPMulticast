@@ -74,7 +74,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\Dependency\windowstimestampproject\include;$(PROGRAMFILES)\SMI\iView X SDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\Dependency\windowstimestampproject\include;$(PROGRAMFILES)\SMI\iView X SDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -90,7 +90,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\Dependency\windowstimestampproject\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\Dependency\windowstimestampproject\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -107,9 +107,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\Dependency\windowstimestampproject\include;$(PROGRAMFILES)\SMI\iView X SDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\Dependency\windowstimestampproject\include;$(PROGRAMFILES)\SMI\iView X SDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <PreprocessorDefinitions>HAS_SMI_INTEGRATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -130,7 +130,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\Dependency\windowstimestampproject\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\Dependency\windowstimestampproject\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -144,18 +144,19 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="strHash.cpp" />
-    <ClCompile Include="UDPMultiCast.cpp" />
-    <ClCompile Include="utils.cpp" />
+    <ClInclude Include="git_refid.h" />
+    <ClInclude Include="UDPMultiCast\config.h" />
+    <ClInclude Include="UDPMultiCast\includes.h" />
+    <ClInclude Include="UDPMultiCast\mpmcBoundedQueue.h" />
+    <ClInclude Include="UDPMultiCast\strHash.h" />
+    <ClInclude Include="UDPMultiCast\types.h" />
+    <ClInclude Include="UDPMultiCast\UDPMultiCast.h" />
+    <ClInclude Include="UDPMultiCast\utils.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="git_refid.h" />
-    <ClInclude Include="includes.h" />
-    <ClInclude Include="mpmcBoundedQueue.h" />
-    <ClInclude Include="strHash.h" />
-    <ClInclude Include="types.h" />
-    <ClInclude Include="UDPMultiCast.h" />
-    <ClInclude Include="utils.h" />
+    <ClCompile Include="src\strHash.cpp" />
+    <ClCompile Include="src\UDPMultiCast.cpp" />
+    <ClCompile Include="src\utils.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
