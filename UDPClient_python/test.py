@@ -6,6 +6,10 @@ udp.port = 4444;
 udp.init();
 udp.loopBack = True;
 
+if False:
+    # test computer filter
+    udp.setComputerFilter([1,2,3])
+
 UDPClient.getCurrentTime()    # warmup timestamper
 
 # send a bunch of messages
