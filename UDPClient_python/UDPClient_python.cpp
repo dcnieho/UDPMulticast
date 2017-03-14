@@ -51,6 +51,27 @@ list getCommands(UDPMultiCast& udp_) {
     return convertMsgs.getMessages(udp_.getCommands());
 }
 
+void setComputerFilter(UDPMultiCast& udp_,list computerFilterList_)
+{
+    auto n = len(computerFilterList_);
+    if (!n)
+        udp_.setComputerFilter(nullptr, 0);
+    else
+    {
+        auto arr = new double[n];
+        for (boost::python::ssize_t i=0; i<n; i++)
+        {
+            extract<double> x(computerFilterList_[i]);	// check if contains double or something convertable to double
+            if (x.check())
+                arr[i] = x();
+            else
+                ErrorMsgExit("setComputerFilter: list contains python object that is not convertable to double");
+        }
+        udp_.setComputerFilter(arr, n);
+        delete[] arr;
+    }
+}
+
 // tell boost.python about functions with optional arguments
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(sendWithTimeStamp_overloads, UDPMultiCast::sendWithTimeStamp, 1, 2);
 #ifdef HAS_SMI_INTEGRATION
@@ -81,7 +102,7 @@ BOOST_PYTHON_MODULE(UDPClient_python)
         .add_property("bufferSize", &UDPMultiCast::getBufferSize, &UDPMultiCast::setBufferSize)
         .add_property("numQueuedReceives", &UDPMultiCast::getNumQueuedReceives, &UDPMultiCast::setNumQueuedReceives)
         .add_property("numReceiverThreads", &UDPMultiCast::getNumReceiverThreads, &UDPMultiCast::setNumReceiverThreads)
-        .def("setComputerFilter", &UDPMultiCast::setComputerFilter)
+        .def("setComputerFilter", setComputerFilter)
 #ifdef HAS_SMI_INTEGRATION
         .def("hasSMIIntegration", &UDPMultiCast::hasSMIIntegration)
         .def("startSMIDataSender", &UDPMultiCast::startSMIDataSender, startSMIDataSender_overloads())
