@@ -192,9 +192,12 @@ void UDPMultiCast::deInit()
     _initialized = false;
 }
 
-void UDPMultiCast::sendWithTimeStamp(const std::string msg_, const char delim_/* = ','*/)
+int64_t UDPMultiCast::sendWithTimeStamp(const std::string msg_, const char delim_/* = ','*/)
 {
-    send(msg_ + delim_ + std::to_string(timeUtils::getTimeStamp()));
+    int64_t timeStamp = timeUtils::getTimeStamp();
+    send(msg_ + delim_ + std::to_string(timeStamp));
+
+    return timeStamp;
 }
 
 void UDPMultiCast::send(const std::string msg_)

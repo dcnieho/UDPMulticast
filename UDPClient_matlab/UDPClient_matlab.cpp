@@ -83,8 +83,11 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         }
         // Call the method
         char *str;
-        UDPinstance->sendWithTimeStamp(str = mxArrayToString(prhs[2]),delim);
+        uint64_t timeStamp = UDPinstance->sendWithTimeStamp(str = mxArrayToString(prhs[2]),delim);
         mxFree(str);
+        // return timestamp (as signed int to keep calculating with it easy)
+        plhs[0] = mxCreateNumericMatrix(1, 1, mxINT64_CLASS, mxREAL);
+        *static_cast<int64_t*>(mxGetData(plhs[0])) = timeStamp;
         return;
     }
     case ct::crc32("send"):
@@ -306,7 +309,7 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
             mexErrMsgTxt("getCurrentTime: Unexpected arguments.");
         // Call the method
         plhs[0] = mxCreateNumericMatrix(1, 1, mxINT64_CLASS, mxREAL);
-        *static_cast<long long*>(mxGetData(plhs[0])) = timeUtils::getTimeStamp();
+        *static_cast<int64_t>(mxGetData(plhs[0])) = timeUtils::getTimeStamp();
         return;
     case ct::crc32("hasSMIIntegration"):
         plhs[0] = mxCreateNumericMatrix(1, 1, mxLOGICAL_CLASS, mxREAL);
@@ -366,7 +369,7 @@ mxArray* msgVectorToMatlab(std::vector<message> msgs_)
         mxSetFieldByNumber(out, i, 0, mxCreateString(msg.text.get()));
         mxArray *temp;
         mxSetFieldByNumber(out, i, 1, temp = mxCreateNumericMatrix(1, 1, mxINT64_CLASS, mxREAL));
-        *static_cast<long long*>(mxGetData(temp)) = msg.timeStamp;
+        *static_cast<int64_t*>(mxGetData(temp)) = msg.timeStamp;
 #ifdef IP_ADDR_AS_STR
         mxSetFieldByNumber(out, i, 2, mxCreateString(msg.ip));
 #else

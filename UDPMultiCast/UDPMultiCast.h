@@ -17,7 +17,7 @@ public:
 
     void init();
     void deInit();
-    void sendWithTimeStamp(const std::string msg_, const char delim_ = ',');
+    int64_t sendWithTimeStamp(const std::string msg_, const char delim_ = ',');
     void send(const std::string msg_);
     // check if receiver threads are still running. They may close when an exit message is received
     // function returns how many threads are running
