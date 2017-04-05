@@ -309,7 +309,7 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
             mexErrMsgTxt("getCurrentTime: Unexpected arguments.");
         // Call the method
         plhs[0] = mxCreateNumericMatrix(1, 1, mxINT64_CLASS, mxREAL);
-        *static_cast<int64_t>(mxGetData(plhs[0])) = timeUtils::getTimeStamp();
+        *static_cast<int64_t*>(mxGetData(plhs[0])) = timeUtils::getTimeStamp();
         return;
     case ct::crc32("hasSMIIntegration"):
         plhs[0] = mxCreateNumericMatrix(1, 1, mxLOGICAL_CLASS, mxREAL);
