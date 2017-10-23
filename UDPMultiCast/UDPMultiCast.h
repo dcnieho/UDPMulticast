@@ -70,8 +70,6 @@ private:
     bool _initialized = false;
     SOCKET _socket;
     HANDLE _hIOCP;
-    bool _haveCriticalSection = false;
-    CRITICAL_SECTION _criticalSection;
     Threads _threads;
     bool _multiCastJoined = false;
     ip_mreq _multiCastRequest;
@@ -89,7 +87,6 @@ private:
     // params and user prefs, with defaults
     bool _useWTP = false;
     bool _setMaxClockRes = false;
-    DWORD _spinCount = 4000;
     // these can be set
     size_t _bufferSize = 4096;
     unsigned long _IOCPPendingReceives = 5000;

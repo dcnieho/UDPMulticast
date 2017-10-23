@@ -123,9 +123,6 @@ void UDPMultiCast::init()
     std::cout << _IOCPPendingReceives << " receives pending" << std::endl;
 
     // Create IOCP processing threads
-    ::InitializeCriticalSectionAndSpinCount(&_criticalSection, _spinCount);
-    _haveCriticalSection = true;
-
     // Start our worker threads
     for (DWORD i = 0; i < _numIOCPThreads; ++i)
     {
@@ -300,8 +297,8 @@ void UDPMultiCast::setLoopBack(const BOOL& loopBack_)
     _loopBack = loopBack_;
 }
 
-void UDPMultiCast::setReuseSocket(const BOOL& value_) 
-{ 
+void UDPMultiCast::setReuseSocket(const BOOL& value_)
+{
     if (_initialized)
         ErrorMsgExit("cannot reuse socket when already initialized");
 
@@ -409,7 +406,7 @@ void UDPMultiCast::waitIOCPThreadsStop()
 {
     // Wait for all threads to exit
 
-    if (_threads.empty() && !_haveCriticalSection)
+    if (_threads.empty())
         return;
 
     for (auto hThread : _threads)
@@ -422,9 +419,6 @@ void UDPMultiCast::waitIOCPThreadsStop()
         ::CloseHandle(hThread);
     }
     _threads.clear();
-
-    ::DeleteCriticalSection(&_criticalSection);
-    _haveCriticalSection = false;
 }
 
 int UDPMultiCast::checkReceiverThreads()
@@ -442,11 +436,9 @@ int UDPMultiCast::checkReceiverThreads()
             ++it;
     }
 
-    if (_threads.empty() && _haveCriticalSection)
+    if (_threads.empty())
     {
         std::cout << "all threads dead" << std::endl;
-        ::DeleteCriticalSection(&_criticalSection);
-        _haveCriticalSection = false;
     }
 
     return static_cast<int>(_threads.size());
@@ -527,7 +519,7 @@ unsigned int UDPMultiCast::threadFunction()
                     auto action = processMsg(pExtOverlapped->buf.buf, &headerLen, &msgLen);
                     auto msgStart = pExtOverlapped->buf.buf + headerLen; // always ok. if we end up in bit of memory that is null, strdup in message constructor will simply give us an empty string
 
-                    // adds to output queue or takes indicated action 
+                    // adds to output queue or takes indicated action
                     switch (action)
                     {
                     case MsgType::unknown:
