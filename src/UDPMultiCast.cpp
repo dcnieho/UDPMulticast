@@ -109,7 +109,7 @@ void UDPMultiCast::init()
     {
         EXTENDED_OVERLAPPED *pExtOverlapped = _pExtOverlappedArray + i;
 
-        ZeroMemory(pExtOverlapped, sizeof(EXTENDED_OVERLAPPED));
+        RtlSecureZeroMemory(pExtOverlapped, sizeof(EXTENDED_OVERLAPPED));
 
         pExtOverlapped->buf.buf = _pReceiveBuffers + offset;
         pExtOverlapped->buf.len = static_cast<ULONG>(_bufferSize);	// lets assume the buffer size does not exceed 32bit limits
@@ -549,7 +549,7 @@ unsigned int UDPMultiCast::threadFunction()
                     }
 
                     // overwrite msg with null so we keep our receive buffer clean
-                    memset(pExtOverlapped->buf.buf,'\0',msgLen);
+                    RtlSecureZeroMemory(pExtOverlapped->buf.buf,msgLen);
                 }
 
                 // queue up new receive request. Note that a completion packet will be queued up even if this returns immediately
