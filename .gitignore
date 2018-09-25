@@ -18,3 +18,4 @@ git_refid.h
 *.VC.db
 *.iobj
 *.ipdb
+/*.vs
