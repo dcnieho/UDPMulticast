@@ -73,33 +73,35 @@
     <TargetExt>.mexw32</TargetExt>
     <OutDir>$(ProjectDir)</OutDir>
     <TargetName>$(ProjectName)_d</TargetName>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>build\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetExt>.mexw32</TargetExt>
     <OutDir>$(ProjectDir)</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <IntDir>build\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetExt>.mexw64</TargetExt>
     <OutDir>$(ProjectDir)</OutDir>
     <TargetName>$(ProjectName)_d</TargetName>
+    <IntDir>build\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetExt>.mexw64</TargetExt>
     <OutDir>$(ProjectDir)</OutDir>
+    <IntDir>build\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\.;C:\Program Files (x86)\MATLAB\R2015b\extern\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\.;$(MATLAB32_ROOT)\extern\include;$(PROGRAMFILES)\SMI\iView X SDK\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Program Files (x86)\MATLAB\R2015b\extern\lib\win32\microsoft</AdditionalLibraryDirectories>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;..\$(IntDir)UDPClient.lib;..\..\Dependency\windowstimestampproject\lib\$(Configuration)\$(Platform)\G_Lib.lib;libmx.lib;libmex.lib;libmat.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(MATLAB32_ROOT)\extern\lib\win32\microsoft;$(PROGRAMFILES)\SMI\iView X SDK\lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;..\$(Platform)\$(Configuration)\UDPClient.lib;libmx.lib;libmex.lib;libmat.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/export:mexFunction %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
@@ -108,12 +110,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\.;C:\Program Files\MATLAB\R2016a\extern\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\.;$(MATLAB_ROOT)\extern\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Program Files\MATLAB\R2016a\extern\lib\win64\microsoft</AdditionalLibraryDirectories>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;..\$(IntDir)UDPClient.lib;..\..\Dependency\windowstimestampproject\lib\$(Configuration)\$(Platform)\G_Lib.lib;libmx.lib;libmex.lib;libmat.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(MATLAB_ROOT)\extern\lib\win64\microsoft</AdditionalLibraryDirectories>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;..\$(Platform)\$(Configuration)\UDPClient.lib;libmx.lib;libmex.lib;libmat.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/export:mexFunction %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
@@ -124,7 +126,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\.;C:\Program Files (x86)\MATLAB\R2015b\extern\include;$(PROGRAMFILES)\SMI\iView X SDK\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\.;$(MATLAB32_ROOT)\extern\include;$(PROGRAMFILES)\SMI\iView X SDK\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PreprocessorDefinitions>_WINDLL;HAS_SMI_INTEGRATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -132,8 +134,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;..\$(Configuration)\UDPClient.lib;..\..\Dependency\windowstimestampproject\lib\$(Configuration)\$(Platform)\G_Lib.lib;iViewXAPI.lib;libmx.lib;libmex.lib;libmat.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Program Files (x86)\MATLAB\R2015b\extern\lib\win32\microsoft;$(PROGRAMFILES)\SMI\iView X SDK\lib;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;..\$(Platform)\$(Configuration)\UDPClient.lib;libmx.lib;libmex.lib;libmat.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(MATLAB32_ROOT)\extern\lib\win32\microsoft;$(PROGRAMFILES)\SMI\iView X SDK\lib;</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -143,15 +145,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\.;C:\Program Files\MATLAB\R2016b\extern\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\.;$(MATLAB_ROOT)\extern\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\Program Files\MATLAB\R2016b\extern\lib\win64\microsoft</AdditionalLibraryDirectories>
-      <AdditionalDependencies>legacy_stdio_definitions.lib;..\$(IntDir)UDPClient.lib;..\..\Dependency\windowstimestampproject\lib\$(Configuration)\$(Platform)\G_Lib.lib;libmx.lib;libmex.lib;libmat.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(MATLAB_ROOT)\extern\lib\win64\microsoft</AdditionalLibraryDirectories>
+      <AdditionalDependencies>legacy_stdio_definitions.lib;..\$(Platform)\$(Configuration)\UDPClient.lib;libmx.lib;libmex.lib;libmat.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

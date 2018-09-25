@@ -1,16 +1,19 @@
 #include "UDPMultiCast/utils.h"
-#include "G_User.h"
-//#include <ntstatus.h>
+#ifdef HAS_WINDOWSTIMESTAMPPROJECT
+#   include "G_User.h"
+#	pragma comment(lib, "G_Lib.lib")
+#endif
 
 // to solve linker error of G_Lib.lib, which is compiled with older MSVC
 // not sure this would actually work if any of these functions are needed!
 extern "C" { FILE __iob_func[3] = { *stdin,*stdout,*stderr }; }
 
 
-namespace {
+namespace
+{
     typedef int64_t (*fpGetTimeStamp) (void);
     fpGetTimeStamp getTimeFun = nullptr;
-    
+
     // filetime to UNIX epoch
     int64_t ftimeToUNIX(int64_t ftime)
     {
@@ -24,11 +27,13 @@ namespace {
         // That is a total of 134774 days, which is 11644473600 seconds.
         return (ftime+5) / 10 - 11644473600 * 1000 * 1000;
     }
+
     int64_t ftimeToUNIX(FILETIME ftime)
     {
         return ftimeToUNIX((static_cast<int64_t>(ftime.dwHighDateTime) << 32) | ftime.dwLowDateTime);
     }
 
+#ifdef HAS_WINDOWSTIMESTAMPPROJECT
     // get with windows timestamp project code
     int64_t getTimeStampWTP()
     {
@@ -36,6 +41,7 @@ namespace {
         GetTimeStamp(&TimeStamp);
         return ftimeToUNIX(TimeStamp.Time);
     }
+#endif
 
     // dynamic load GetSystemTimePreciseAsFileTime as we may be running on a platform that doesn't have it
     typedef WINBASEAPI VOID(WINAPI *fpGetSystemTimePreciseAsFileTime)(_Out_ LPFILETIME);
@@ -75,9 +81,14 @@ namespace timeUtils {
     {
         if (setMaxClockRes)
             setMaxClockResolution();
+#ifndef HAS_WINDOWSTIMESTAMPPROJECT
+        WTP = false;
+#endif
+
 
         if (WTP)
         {
+#ifdef HAS_WINDOWSTIMESTAMPPROJECT
             TimeStamp_TYPE TimeStamp;
             // check the state of G_Kernel.exe without even initializing the pipe services :
             ::GetTimeStamp(&TimeStamp);
@@ -99,6 +110,7 @@ namespace timeUtils {
 
             // done, assign function pointer
             getTimeFun = &getTimeStampWTP;
+#endif
         }
         else
         {

@@ -11,7 +11,11 @@
 
 #ifdef HAS_SMI_INTEGRATION
 #   include "iViewXAPI.h"
-#	pragma comment(lib, "iViewXAPI.lib")
+#   if _WIN64
+#	    pragma comment(lib, "iViewXAPI64.lib")
+#   else
+#	    pragma comment(lib, "iViewXAPI.lib")
+#   endif
 #endif
 
 #include <iostream>
