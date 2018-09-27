@@ -7,13 +7,17 @@ classdef UDPClient < handle
         debugLevel = 0;
         
         parsedCommandBuffer = {};
+    end
+    properties (SetAccess = private)
         hasSMIIntegration;
+        hasTobiiIntegration;
     end
     methods
         %% Constructor - Create a new C++ class instance 
         function this = UDPClient(varargin)
             this.objectHandle       = UDPClient_matlab('new', varargin{:});
-            this.hasSMIIntegration  = UDPClient_matlab('hasSMIIntegration', this.objectHandle);
+            this.hasSMIIntegration  = UDPClient_matlab('hasSMIIntegration'  , this.objectHandle);
+            this.hasTobiiIntegration= UDPClient_matlab('hasTobiiIntegration', this.objectHandle);
         end
         
         %% Destructor - Destroy the C++ class instance
@@ -198,8 +202,29 @@ classdef UDPClient < handle
             UDPClient_matlab('startSMIDataSender', this.objectHandle);
         end
         function removeSMIDataSender(this)
-            assert(this.hasSMIIntegration,'Can''t startSMIDataSender, UDPClient mex compiled without SMI integration')
+            assert(this.hasSMIIntegration,'Can''t removeSMIDataSender, UDPClient mex compiled without SMI integration')
             UDPClient_matlab('removeSMIDataSender', this.objectHandle);
+        end
+        
+        % if compiled with Tobii integration only
+        function connectToTobii(this,address)
+            assert(this.hasTobiiIntegration,'Can''t connectToTobii, UDPClient mex compiled without Tobii integration')
+            if isa(address,'string')
+                address = char(address);    % seems matlab also has a string type, shows up if user accidentally uses double quotes, convert to char
+            end
+            UDPClient_matlab('connectToTobii', this.objectHandle, address);
+        end
+        function setTobiiSampleRate(this,sampleFreq)
+            assert(this.hasTobiiIntegration,'Can''t setTobiiSampleRate, UDPClient mex compiled without Tobii integration')
+            UDPClient_matlab('setTobiiSampleRate', this.objectHandle, sampleFreq);
+        end
+        function startTobiiDataSender(this)
+            assert(this.hasTobiiIntegration,'Can''t startTobiiDataSender, UDPClient mex compiled without Tobii integration')
+            UDPClient_matlab('startTobiiDataSender', this.objectHandle);
+        end
+        function removeTobiiDataSender(this)
+            assert(this.hasTobiiIntegration,'Can''t removeTobiiDataSender, UDPClient mex compiled without Tobii integration')
+            UDPClient_matlab('removeTobiiDataSender', this.objectHandle);
         end
         
         
