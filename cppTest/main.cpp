@@ -16,6 +16,15 @@ int _tmain(int argc, _TCHAR* argv[])
 
     timeUtils::getTimeStamp();  // warmup timestamper
 
+#ifdef HAS_TOBII_INTEGRATION
+    udp.connectToTobii("tet-tcp://169.254.5.224");
+    udp.setTobiiSampleRate(600.f);
+    udp.startTobiiDataSender();
+    Sleep(1000);
+    udp.removeTobiiDataSender();
+    std::vector<message> dataMsgs = udp.getData();
+#else
+
     // send a bunch of messages
     for (int i = 0; i < 2048; i++)
     {
@@ -35,6 +44,7 @@ int _tmain(int argc, _TCHAR* argv[])
         udp.send("cmd");	// testing empty string in message struct
     }
     std::vector<message> cmdMsgs = udp.getCommands();
+#endif
 
     // send exit msg
     std::cout << "nThreads active: " << udp.checkReceiverThreads() << std::endl;

@@ -1,4 +1,5 @@
 ﻿import UDPClient
+import time
 
 udp = UDPClient.UDPClient()
 print "build from git revision ID " + udp.getGitRefID()
@@ -12,24 +13,32 @@ if False:
 
 UDPClient.getCurrentTime()    # warmup timestamper
 
-# send a bunch of messages
-for i in range(1, 2048):
-    udp.sendWithTimeStamp('dat,1,crap',',');
-dataMsgs = udp.getData();
+if udp.hasTobiiIntegration:
+    udp.connectToTobii('tet-tcp://169.254.5.224');
+    udp.setTobiiSampleRate(600.);
+    udp.startTobiiDataSender();
+    time.sleep(1)
+    udp.removeTobiiDataSender();
+    dataMsgs = udp.getData();
+else:
+    # send a bunch of messages
+    for i in range(1, 2048):
+        udp.sendWithTimeStamp('dat,1,crap',',');
+    dataMsgs = udp.getData();
 
-for i in range(1, 20):
-    udp.sendWithTimeStamp('dat,2,crap');    # testing default delimiter
-dataMsgs2 = udp.getData();
+    for i in range(1, 20):
+        udp.sendWithTimeStamp('dat,2,crap');    # testing default delimiter
+    dataMsgs2 = udp.getData();
 
 
-# send a bunch of commands
-for i in range(1, 10):
-    udp.send('cmd');    # testing empty string in message struct
-udp.send('cmd,you should see this');
-cmdMsgs = udp.getCommands();
+    # send a bunch of commands
+    for i in range(1, 10):
+        udp.send('cmd');    # testing empty string in message struct
+    udp.send('cmd,you should see this');
+    cmdMsgs = udp.getCommands();
 
 # test iterator
-for x in cmdMsgs:
+for x in dataMsgs:
     print x.text
 
 # send exit msg
