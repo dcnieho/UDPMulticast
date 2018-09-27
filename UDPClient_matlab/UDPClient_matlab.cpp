@@ -328,11 +328,19 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
     case ct::crc32("connectToTobii"):
     {
         if (nrhs < 2 || !mxIsChar(prhs[1]))
-            mexErrMsgTxt("TobiiBuffer: Second argument must be a string.");
+            mexErrMsgTxt("connectToTobii: Second argument must be a string.");
 
         char* address = mxArrayToString(prhs[1]);
         UDPinstance->connectToTobii(address);
         mxFree(address);
+        return;
+    }
+    case ct::crc32("setTobiiSampleRate"):
+    {
+        if (nrhs < 2 || !mxIsDouble(prhs[2]) || mxIsComplex(prhs[2]))
+            mexErrMsgTxt("setTobiiSampleRate: Second argument must be a double");
+
+        UDPinstance->setTobiiSampleRate(static_cast<float>(*mxGetPr(prhs[1])));
         return;
     }
     case ct::crc32("startTobiiDataSender"):

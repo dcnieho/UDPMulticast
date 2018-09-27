@@ -691,7 +691,7 @@ namespace {
 }
 bool UDPMultiCast::connectToTobii(std::string address_)
 {
-    TobiiResearchStatus status = tobii_research_get_eyetracker(address_.c_str(),&_eyetracker);
+    TobiiResearchStatus status = tobii_research_get_eyetracker(address_.c_str(),&_eyeTracker);
     if (status != TOBII_RESEARCH_STATUS_OK)
     {
         std::stringstream os;
@@ -701,14 +701,34 @@ bool UDPMultiCast::connectToTobii(std::string address_)
     }
     return true;
 }
+bool UDPMultiCast::setTobiiSampleRate(float sampleFreq_)
+{
+    if (_eyeTracker)
+    {
+        TobiiResearchStatus status = tobii_research_set_gaze_output_frequency(_eyeTracker, sampleFreq_);
+        if (status != TOBII_RESEARCH_STATUS_OK)
+        {
+            std::stringstream os;
+            os << "connectToTobii: Cannot set sampling frequency to " << sampleFreq_ << ", ";
+            os << "Error code: " << static_cast<int>(status);
+            DoExitWithMsg(os.str());
+        }
+    }
+    return true;
+}
 bool UDPMultiCast::startTobiiDataSender()
 {
-    _tobiiDataSenderStarted = tobii_research_subscribe_to_gaze_data(_eyetracker,TobiiSampleCallback,this) == TOBII_RESEARCH_STATUS_OK;
+    if (_eyeTracker)
+        _tobiiDataSenderStarted = tobii_research_subscribe_to_gaze_data(_eyeTracker, TobiiSampleCallback, this) == TOBII_RESEARCH_STATUS_OK;
+    else
+        _tobiiDataSenderStarted = false;
     return _tobiiDataSenderStarted;
 }
 void UDPMultiCast::removeTobiiDataSender()
 {
-    tobii_research_unsubscribe_from_gaze_data(_eyetracker,TobiiSampleCallback);
+    if (_eyeTracker)
+        tobii_research_unsubscribe_from_gaze_data(_eyeTracker, TobiiSampleCallback);
+    else
+        _tobiiDataSenderStarted = false;
 }
-
 #endif

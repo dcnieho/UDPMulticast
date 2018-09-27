@@ -118,10 +118,11 @@ public:
 public:
     bool hasTobiiIntegration() {return true;}
     bool connectToTobii(std::string address_);
+    bool setTobiiSampleRate(float sampleFreq_);
     bool startTobiiDataSender();
     void removeTobiiDataSender();
 private:
-    TobiiResearchEyeTracker* _eyetracker		     = nullptr;
+    TobiiResearchEyeTracker* _eyeTracker		     = nullptr;
     bool                     _tobiiDataSenderStarted = false;
 #else
 public:
