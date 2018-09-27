@@ -320,6 +320,28 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         UDPinstance->removeSMIDataSender();
         return;
 #endif // HAS_SMI_INTEGRATION
+    case ct::crc32("hasTobiiIntegration"):
+        plhs[0] = mxCreateNumericMatrix(1, 1, mxLOGICAL_CLASS, mxREAL);
+        *static_cast<bool*>(mxGetData(plhs[0])) = UDPinstance->hasTobiiIntegration();
+        return;
+#ifdef HAS_TOBII_INTEGRATION
+    case ct::crc32("connectToTobii"):
+    {
+        if (nrhs < 2 || !mxIsChar(prhs[1]))
+            mexErrMsgTxt("TobiiBuffer: Second argument must be a string.");
+
+        char* address = mxArrayToString(prhs[1]);
+        UDPinstance->connectToTobii(address);
+        mxFree(address);
+        return;
+    }
+    case ct::crc32("startTobiiDataSender"):
+        UDPinstance->startTobiiDataSender();
+        return;
+    case ct::crc32("removeTobiiDataSender"):
+        UDPinstance->removeTobiiDataSender();
+        return;
+#endif // HAS_SMI_INTEGRATION
     default:
         // Got here, so command not recognized
         mexErrMsgTxt("Command not recognized.");

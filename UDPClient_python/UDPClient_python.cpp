@@ -105,6 +105,12 @@ BOOST_PYTHON_MODULE(UDPClient_python)
         .def("startSMIDataSender", &UDPMultiCast::startSMIDataSender)
         .def("removeSMIDataSender", &UDPMultiCast::removeSMIDataSender)
 #endif // HAS_SMI_INTEGRATION
+        .def("hasTobiiIntegration", &UDPMultiCast::hasTobiiIntegration)
+#ifdef HAS_TOBII_INTEGRATION
+        .def("connectToTobii", &UDPMultiCast::connectToTobii)
+        .def("startTobiiDataSender", &UDPMultiCast::startTobiiDataSender)
+        .def("removeTobiiDataSender", &UDPMultiCast::removeTobiiDataSender)
+#endif // HAS_SMI_INTEGRATION
         ;
 
     // free functions
