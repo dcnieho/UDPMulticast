@@ -6,6 +6,8 @@
 #include <set>
 
 
+// forward declarations
+struct TobiiResearchEyeTracker;
 
 class UDPMultiCast
 {
@@ -109,5 +111,20 @@ private:
 #else
 public:
     bool hasSMIIntegration() {return false;}
+#endif
+
+    // Tobii data sending integration
+#ifdef HAS_TOBII_INTEGRATION
+public:
+    bool hasTobiiIntegration() {return true;}
+    bool connectToTobii(std::string address_);
+    bool startTobiiDataSender();
+    void removeTobiiDataSender();
+private:
+    TobiiResearchEyeTracker* _eyetracker		     = nullptr;
+    bool                     _tobiiDataSenderStarted = false;
+#else
+public:
+    bool hasTobiiIntegration() {return false;}
 #endif
 };

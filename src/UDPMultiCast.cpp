@@ -17,6 +17,12 @@
 #	    pragma comment(lib, "iViewXAPI.lib")
 #   endif
 #endif
+#ifdef HAS_TOBII_INTEGRATION
+#   include <tobii_research.h>
+#   include <tobii_research_eyetracker.h>
+#   include <tobii_research_streams.h>
+#   pragma comment(lib, "tobii_research.lib")
+#endif
 
 #include <iostream>
 #include <process.h>
@@ -152,6 +158,12 @@ void UDPMultiCast::deInit()
         removeSMIDataSender();
 #endif
 
+    // remove smi callback
+#ifdef HAS_TOBII_INTEGRATION
+    if (_tobiiDataSenderStarted)
+        removeTobiiDataSender();
+#endif
+
     // leave multicast group
     leaveMultiCast();
 
@@ -216,6 +228,7 @@ void UDPMultiCast::send(const std::string msg_)
         iV_SendImageMessage(buf);
     }
 #endif
+    // nothing to log for Tobii, system timestamp added when sending is sufficient
 }
 
 void UDPMultiCast::sendInternal(EXTENDED_OVERLAPPED* sendOverlapped_)
@@ -535,6 +548,7 @@ unsigned int UDPMultiCast::threadFunction()
                             iV_SendImageMessage(buf);
                         }
 #endif
+                        // nothing to log for Tobii: system timestamp set when receiving is sufficient
                         break;
                     }
 
@@ -655,6 +669,46 @@ void UDPMultiCast::startSMIDataSender(bool needConnect /*= false*/)
 void UDPMultiCast::removeSMIDataSender()
 {
     iV_SetSampleCallback(nullptr);
+}
+
+#endif
+
+
+#ifdef HAS_TOBII_INTEGRATION
+// callback must be a free function
+namespace {
+    void TobiiSampleCallback(TobiiResearchGazeData* gaze_data_, void* user_data)
+    {
+        if (user_data)
+        {
+            char buf[128] = { '\0' };
+            sprintf_s(buf, "dat,%lld,%.5f,%.5f,%.5f,%.5f", gaze_data_->system_time_stamp,
+                gaze_data_->left_eye .gaze_point.position_on_display_area.x, gaze_data_->left_eye .gaze_point.position_on_display_area.y,
+                gaze_data_->right_eye.gaze_point.position_on_display_area.x, gaze_data_->right_eye.gaze_point.position_on_display_area.y);
+            static_cast<UDPMultiCast*>(user_data)->sendWithTimeStamp(buf);
+        }
+    }
+}
+bool UDPMultiCast::connectToTobii(std::string address_)
+{
+    TobiiResearchStatus status = tobii_research_get_eyetracker(address_.c_str(),&_eyetracker);
+    if (status != TOBII_RESEARCH_STATUS_OK)
+    {
+        std::stringstream os;
+        os << "connectToTobii: Cannot get eye tracker \"" << address_ << "\", ";
+        os << "Error code: " << static_cast<int>(status);
+        DoExitWithMsg(os.str());
+    }
+    return true;
+}
+bool UDPMultiCast::startTobiiDataSender()
+{
+    _tobiiDataSenderStarted = tobii_research_subscribe_to_gaze_data(_eyetracker,TobiiSampleCallback,this) == TOBII_RESEARCH_STATUS_OK;
+    return _tobiiDataSenderStarted;
+}
+void UDPMultiCast::removeTobiiDataSender()
+{
+    tobii_research_unsubscribe_from_gaze_data(_eyetracker,TobiiSampleCallback);
 }
 
 #endif

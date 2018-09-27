@@ -71,24 +71,24 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetExt>.mexw32</TargetExt>
-    <OutDir>$(ProjectDir)</OutDir>
+    <OutDir>$(ProjectDir)\32</OutDir>
     <TargetName>$(ProjectName)_d</TargetName>
     <IntDir>build\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetExt>.mexw32</TargetExt>
-    <OutDir>$(ProjectDir)</OutDir>
+    <OutDir>$(ProjectDir)\32</OutDir>
     <IntDir>build\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetExt>.mexw64</TargetExt>
-    <OutDir>$(ProjectDir)</OutDir>
+    <OutDir>$(ProjectDir)\64</OutDir>
     <TargetName>$(ProjectName)_d</TargetName>
     <IntDir>build\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <TargetExt>.mexw64</TargetExt>
-    <OutDir>$(ProjectDir)</OutDir>
+    <OutDir>$(ProjectDir)\64</OutDir>
     <IntDir>build\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
