@@ -27,6 +27,7 @@
 #include <iostream>
 #include <process.h>
 #include <cstring>
+#include <cmath>
 
 UDPMultiCast::UDPMultiCast()
 {
@@ -682,9 +683,21 @@ namespace {
         if (user_data)
         {
             char buf[128] = { '\0' };
-            sprintf_s(buf, "dat,%lld,%.5f,%.5f,%.5f,%.5f", gaze_data_->system_time_stamp,
-                gaze_data_->left_eye .gaze_point.position_on_display_area.x, gaze_data_->left_eye .gaze_point.position_on_display_area.y,
-                gaze_data_->right_eye.gaze_point.position_on_display_area.x, gaze_data_->right_eye.gaze_point.position_on_display_area.y);
+            // bunch of crap to make sure we get a simple quiet nan, not the indefinite nan that is formatted as -nan(ind)
+            auto lx = gaze_data_->left_eye .gaze_point.position_on_display_area.x;
+            if (std::isnan(lx))
+                lx = std::nanf("");
+            auto ly = gaze_data_->left_eye .gaze_point.position_on_display_area.y;
+            if (std::isnan(ly))
+                ly = std::nanf("");
+            auto rx = gaze_data_->right_eye.gaze_point.position_on_display_area.x;
+            if (std::isnan(rx))
+                rx = std::nanf("");
+            auto ry = gaze_data_->right_eye.gaze_point.position_on_display_area.y;
+            if (std::isnan(ry))
+                ry = std::nanf("");
+
+            sprintf_s(buf, "dat,%lld,%.5f,%.5f,%.5f,%.5f", gaze_data_->system_time_stamp, lx,ly, rx,ry);
             static_cast<UDPMultiCast*>(user_data)->sendWithTimeStamp(buf);
         }
     }
