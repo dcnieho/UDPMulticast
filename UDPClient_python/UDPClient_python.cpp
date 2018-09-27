@@ -74,9 +74,6 @@ void setComputerFilter(UDPMultiCast& udp_,list computerFilterList_)
 
 // tell boost.python about functions with optional arguments
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(sendWithTimeStamp_overloads, UDPMultiCast::sendWithTimeStamp, 1, 2);
-#ifdef HAS_SMI_INTEGRATION
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(startSMIDataSender_overloads, UDPMultiCast::startSMIDataSender, 0, 1);
-#endif
 // start module scope
 BOOST_PYTHON_MODULE(UDPClient_python)
 {
@@ -103,12 +100,10 @@ BOOST_PYTHON_MODULE(UDPClient_python)
         .add_property("numQueuedReceives", &UDPMultiCast::getNumQueuedReceives, &UDPMultiCast::setNumQueuedReceives)
         .add_property("numReceiverThreads", &UDPMultiCast::getNumReceiverThreads, &UDPMultiCast::setNumReceiverThreads)
         .def("setComputerFilter", setComputerFilter)
+        .def("hasSMIIntegration", &UDPMultiCast::hasSMIIntegration)
 #ifdef HAS_SMI_INTEGRATION
-        .def("hasSMIIntegration", &UDPMultiCast::hasSMIIntegration)
-        .def("startSMIDataSender", &UDPMultiCast::startSMIDataSender, startSMIDataSender_overloads())
+        .def("startSMIDataSender", &UDPMultiCast::startSMIDataSender)
         .def("removeSMIDataSender", &UDPMultiCast::removeSMIDataSender)
-#else // HAS_SMI_INTEGRATION
-        .def("hasSMIIntegration", &UDPMultiCast::hasSMIIntegration)
 #endif // HAS_SMI_INTEGRATION
         ;
 

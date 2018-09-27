@@ -659,7 +659,7 @@ namespace {
         return 1;
     }
 }
-void UDPMultiCast::startSMIDataSender(bool needConnect /*= false*/)
+void UDPMultiCast::startSMIDataSender()
 {
     classPtr = this;
     if (RET_SUCCESS != iV_SetSampleCallback(SMISampleCallback))
