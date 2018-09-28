@@ -77,7 +77,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetExt>.pyd</TargetExt>
     <TargetName>UDPClient_python_d</TargetName>
-    <OutDir>.\</OutDir>
+    <OutDir>.\UDPClient\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>.\UDPClient\</OutDir>
@@ -85,7 +85,7 @@
     <TargetExt>.pyd</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>.\UDPClient</OutDir>
+    <OutDir>.\UDPClient\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <TargetName>UDPClient_python</TargetName>
     <TargetExt>.pyd</TargetExt>
