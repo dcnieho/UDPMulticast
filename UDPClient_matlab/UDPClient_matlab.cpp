@@ -83,9 +83,9 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         }
         // Call the method
         char *str;
-        uint64_t timeStamp = UDPinstance->sendWithTimeStamp(str = mxArrayToString(prhs[2]),delim);
+        int64_t timeStamp = UDPinstance->sendWithTimeStamp(str = mxArrayToString(prhs[2]),delim);
         mxFree(str);
-        // return timestamp (as signed int to keep calculating with it easy)
+        // return timestamp
         plhs[0] = mxCreateNumericMatrix(1, 1, mxINT64_CLASS, mxREAL);
         *static_cast<int64_t*>(mxGetData(plhs[0])) = timeStamp;
         return;
