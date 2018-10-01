@@ -672,31 +672,34 @@ void UDPMultiCast::removeSMIDataSender()
 
 #ifdef HAS_TOBII_INTEGRATION
 // callback must be a free function
-namespace {
-    void TobiiSampleCallback(TobiiResearchGazeData* gaze_data_, void* user_data)
+void TobiiSampleCallback(TobiiResearchGazeData* gaze_data_, void* user_data)
+{
+    if (user_data)
     {
-        if (user_data)
-        {
-            char buf[128] = { '\0' };
-            // bunch of crap to make sure we get a simple quiet nan, not the indefinite nan that is formatted as -nan(ind)
-            auto lx = gaze_data_->left_eye .gaze_point.position_on_display_area.x;
-            if (std::isnan(lx))
-                lx = std::nanf("");
-            auto ly = gaze_data_->left_eye .gaze_point.position_on_display_area.y;
-            if (std::isnan(ly))
-                ly = std::nanf("");
-            auto rx = gaze_data_->right_eye.gaze_point.position_on_display_area.x;
-            if (std::isnan(rx))
-                rx = std::nanf("");
-            auto ry = gaze_data_->right_eye.gaze_point.position_on_display_area.y;
-            if (std::isnan(ry))
-                ry = std::nanf("");
+        char buf[128] = { '\0' };
+        // bunch of crap to make sure we get a simple quiet nan, not the indefinite nan that is formatted as -nan(ind)
+        auto scrSize = static_cast<UDPMultiCast*>(user_data)->_scrSize;
+        if (scrSize.empty())
+            return;
 
-            sprintf_s(buf, "dat,%lld,%.5f,%.5f,%.5f,%.5f", gaze_data_->system_time_stamp, lx,ly, rx,ry);
-            static_cast<UDPMultiCast*>(user_data)->sendWithTimeStamp(buf);
-        }
+        auto lx = gaze_data_->left_eye .gaze_point.position_on_display_area.x*scrSize[0];
+        if (std::isnan(lx))
+            lx = std::nanf("");
+        auto ly = gaze_data_->left_eye .gaze_point.position_on_display_area.y*scrSize[1];
+        if (std::isnan(ly))
+            ly = std::nanf("");
+        auto rx = gaze_data_->right_eye.gaze_point.position_on_display_area.x*scrSize[0];
+        if (std::isnan(rx))
+            rx = std::nanf("");
+        auto ry = gaze_data_->right_eye.gaze_point.position_on_display_area.y*scrSize[1];
+        if (std::isnan(ry))
+            ry = std::nanf("");
+
+        sprintf_s(buf, "dat,%lld,%.2f,%.2f,%.2f,%.2f", gaze_data_->system_time_stamp, lx,ly, rx,ry);
+        static_cast<UDPMultiCast*>(user_data)->sendWithTimeStamp(buf);
     }
 }
+
 bool UDPMultiCast::connectToTobii(std::string address_)
 {
     TobiiResearchStatus status = tobii_research_get_eyetracker(address_.c_str(),&_eyeTracker);
@@ -723,6 +726,16 @@ bool UDPMultiCast::setTobiiSampleRate(float sampleFreq_)
         }
     }
     return true;
+}
+void UDPMultiCast::setTobiiScrSize(std::vector<double> scrSize_)
+{
+    if (scrSize_.size()!=2)
+    {
+        std::stringstream os;
+        os << "setTobiiScrSize: Expected 2 values ([x,y] screen size), got " << scrSize_.size();
+        DoExitWithMsg(os.str());
+    }
+    _scrSize = scrSize_;
 }
 bool UDPMultiCast::startTobiiDataSender()
 {

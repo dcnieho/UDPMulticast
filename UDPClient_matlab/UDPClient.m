@@ -214,6 +214,10 @@ classdef UDPClient < handle
             end
             UDPClient_matlab('connectToTobii', this.objectHandle, address);
         end
+        function setTobiiScrSize(this,scrSize)
+            assert(this.hasTobiiIntegration,'Can''t setTobiiScrSize, UDPClient mex compiled without Tobii integration')
+            UDPClient_matlab('setTobiiScrSize', this.objectHandle, scrSize);
+        end
         function setTobiiSampleRate(this,sampleFreq)
             assert(this.hasTobiiIntegration,'Can''t setTobiiSampleRate, UDPClient mex compiled without Tobii integration')
             UDPClient_matlab('setTobiiSampleRate', this.objectHandle, sampleFreq);

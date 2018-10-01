@@ -18,6 +18,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 #ifdef HAS_TOBII_INTEGRATION
     udp.connectToTobii("tet-tcp://169.254.5.224");
+    udp.setTobiiScrSize({1920., 1080.});
     udp.setTobiiSampleRate(600.f);
     udp.startTobiiDataSender();
     std::cin.ignore();  // wait for any key press

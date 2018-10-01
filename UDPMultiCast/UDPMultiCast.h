@@ -117,12 +117,16 @@ public:
 public:
     bool hasTobiiIntegration() {return true;}
     bool connectToTobii(std::string address_);
+    void setTobiiScrSize(std::vector<double> scrSize_);
     bool setTobiiSampleRate(float sampleFreq_);
     bool startTobiiDataSender();
     void removeTobiiDataSender();
 private:
+    friend void TobiiSampleCallback(TobiiResearchGazeData* gaze_data_, void* user_data);
+
     TobiiResearchEyeTracker* _eyeTracker		     = nullptr;
     bool                     _tobiiDataSenderStarted = false;
+    std::vector<double>      _scrSize                = {1.,1.};
 #else
 public:
     bool hasTobiiIntegration() {return false;}

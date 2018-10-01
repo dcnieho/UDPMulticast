@@ -108,6 +108,7 @@ BOOST_PYTHON_MODULE(UDPClient_python)
         .def("hasTobiiIntegration", &UDPMultiCast::hasTobiiIntegration)
 #ifdef HAS_TOBII_INTEGRATION
         .def("connectToTobii", &UDPMultiCast::connectToTobii)
+        .def("connectToTobii", &UDPMultiCast::setTobiiScrSize)
         .def("setTobiiSampleRate", &UDPMultiCast::setTobiiSampleRate)
         .def("startTobiiDataSender", &UDPMultiCast::startTobiiDataSender)
         .def("removeTobiiDataSender", &UDPMultiCast::removeTobiiDataSender)
