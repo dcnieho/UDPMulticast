@@ -328,14 +328,6 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         *static_cast<bool*>(mxGetData(plhs[0])) = UDPinstance->hasTobiiIntegration();
         return;
 #ifdef HAS_TOBII_INTEGRATION
-    case ct::crc32("setTobiiScrSize"):
-    {
-        if (nrhs < 2 || !mxIsDouble(prhs[2]) || mxIsComplex(prhs[2]) || mxGetNumberOfElements(prhs[2])!=2)
-            mexErrMsgTxt("setTobiiScrSize: Third argument must be a double array with two elements ([x,y] screen size).");
-
-        UDPinstance->setTobiiScrSize({static_cast<double>(*mxGetPr(prhs[2])),static_cast<double>(*(mxGetPr(prhs[2])+1))});
-        return;
-    }
     case ct::crc32("connectToTobii"):
     {
         if (nrhs < 2 || !mxIsChar(prhs[2]))
@@ -344,6 +336,14 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         char* address = mxArrayToString(prhs[2]);
         UDPinstance->connectToTobii(address);
         mxFree(address);
+        return;
+    }
+    case ct::crc32("setTobiiScrSize"):
+    {
+        if (nrhs < 2 || !mxIsDouble(prhs[2]) || mxIsComplex(prhs[2]) || mxGetNumberOfElements(prhs[2]) != 2)
+            mexErrMsgTxt("setTobiiScrSize: Third argument must be a double array with two elements ([x,y] screen size).");
+
+        UDPinstance->setTobiiScrSize({static_cast<double>(*mxGetPr(prhs[2])),static_cast<double>(*(mxGetPr(prhs[2]) + 1))});
         return;
     }
     case ct::crc32("setTobiiSampleRate"):
