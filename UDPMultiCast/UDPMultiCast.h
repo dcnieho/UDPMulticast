@@ -5,11 +5,19 @@
 #include <string>
 #include <set>
 
-#pragma comment(lib, "UDPclient.lib")
+#ifndef _DEBUG
+#   pragma comment(lib, "UDPclient.lib")
+#else
+#   pragma comment(lib, "UDPclient_d.lib")
+#endif
 
 
-// forward declarations
-struct TobiiResearchEyeTracker;
+#ifdef HAS_TOBII_INTEGRATION
+#   include <tobii_research.h>
+#   include <tobii_research_streams.h>
+#endif
+
+
 
 class UDPMultiCast
 {
