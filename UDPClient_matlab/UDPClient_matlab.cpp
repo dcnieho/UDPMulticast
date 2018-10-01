@@ -343,7 +343,7 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         if (nrhs < 2 || !mxIsDouble(prhs[2]) || mxIsComplex(prhs[2]) || mxGetNumberOfElements(prhs[2]) != 2)
             mexErrMsgTxt("setTobiiScrSize: Third argument must be a double array with two elements ([x,y] screen size).");
 
-        UDPinstance->setTobiiScrSize({static_cast<double>(*mxGetPr(prhs[2])),static_cast<double>(*(mxGetPr(prhs[2]) + 1))});
+        UDPinstance->setTobiiScrSize({*mxGetPr(prhs[2]),*(mxGetPr(prhs[2]) + 1)});
         return;
     }
     case ct::crc32("setTobiiSampleRate"):
