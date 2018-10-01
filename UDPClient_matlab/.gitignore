@@ -1,3 +1,2 @@
-*.mexw64
-*.mexw32
-*.dll
+*_d.mexw64
+*_d.mexw32
