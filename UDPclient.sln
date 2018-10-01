@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.28010.2003
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UDPclient", "UDPclient.vcxproj", "{C2F34656-DC69-4C98-8D84-C768985BEE5F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UDPClient_matlab", "UDPClient_matlab\UDPClient_matlab.vcxproj", "{DA75F547-03D8-42D2-862E-88AE216D9E72}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UDPclient_matlab", "UDPClient_matlab\UDPClient_matlab.vcxproj", "{DA75F547-03D8-42D2-862E-88AE216D9E72}"
 	ProjectSection(ProjectDependencies) = postProject
 		{9A014AC0-DCF6-479B-83A1-417351E04DF8} = {9A014AC0-DCF6-479B-83A1-417351E04DF8}
 	EndProjectSection
@@ -15,12 +15,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cppTest", "cppTest\cppTest.
 		{C2F34656-DC69-4C98-8D84-C768985BEE5F} = {C2F34656-DC69-4C98-8D84-C768985BEE5F}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UDPClient_python_cpp", "UDPClient_python\UDPClient_python_cpp.vcxproj", "{2C6137C2-382B-4A3E-B06D-38DC4F6E5EE7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UDPclient_python_cpp", "UDPClient_python\UDPClient_python_cpp.vcxproj", "{2C6137C2-382B-4A3E-B06D-38DC4F6E5EE7}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C2F34656-DC69-4C98-8D84-C768985BEE5F} = {C2F34656-DC69-4C98-8D84-C768985BEE5F}
 	EndProjectSection
 EndProject
-Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "UDPClient_python_py", "UDPClient_python\UDPClient_python_py.pyproj", "{45FABE76-C9B7-495C-8487-39D9DC383C06}"
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "UDPClient_python_py", "UDPClient_python\UDPclient_python_py.pyproj", "{45FABE76-C9B7-495C-8487-39D9DC383C06}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

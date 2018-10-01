@@ -5,6 +5,8 @@
 #include <string>
 #include <set>
 
+#pragma comment(lib, "UDPclient.lib")
+
 
 // forward declarations
 struct TobiiResearchEyeTracker;
