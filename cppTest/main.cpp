@@ -20,7 +20,7 @@ int _tmain(int argc, _TCHAR* argv[])
     udp.connectToTobii("tet-tcp://169.254.5.224");
     udp.setTobiiSampleRate(600.f);
     udp.startTobiiDataSender();
-    Sleep(1000);
+    std::cin.ignore();  // wait for any key press
     udp.removeTobiiDataSender();
     std::vector<message> dataMsgs = udp.getData();
 #else
