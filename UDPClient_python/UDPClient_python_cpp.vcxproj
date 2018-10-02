@@ -71,24 +71,24 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetExt>.pyd</TargetExt>
-    <OutDir>.\UDPClient\</OutDir>
+    <OutDir>.\UDPClient\bit32\</OutDir>
     <IntDir>build\$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>UDPClient_python</TargetName>
+    <TargetName>UDPClient_python_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetExt>.pyd</TargetExt>
     <TargetName>UDPClient_python_d</TargetName>
-    <OutDir>.\UDPClient\</OutDir>
+    <OutDir>.\UDPClient\bit64\</OutDir>
     <IntDir>build\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>.\UDPClient\</OutDir>
+    <OutDir>.\UDPClient\bit64\</OutDir>
     <TargetName>UDPClient_python</TargetName>
     <TargetExt>.pyd</TargetExt>
     <IntDir>build\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>.\UDPClient\</OutDir>
+    <OutDir>.\UDPClient\bit32\</OutDir>
     <IntDir>build\$(Platform)\$(Configuration)\</IntDir>
     <TargetName>UDPClient_python</TargetName>
     <TargetExt>.pyd</TargetExt>
@@ -98,11 +98,11 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\.;..\..\Dependency\boost;C:\Users\Diederick\Anaconda2\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\.;$(VcpkgRoot)include\python2.7\;$(PROGRAMFILES)\SMI\iView X SDK\include;..\Dependency\windowstimestampproject\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)output\$(Platform);..\..\Dependency\windowstimestampproject\lib\$(Configuration)\$(Platform);%(AdditionalDependencies)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)output\$(Platform);$(PROGRAMFILES)\SMI\iView X SDK\lib;..\..\Dependency\windowstimestampproject\lib\$(Configuration)\$(Platform)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
       <AdditionalDependencies>legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -112,12 +112,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\.;..\..\Dependency\boost;C:\Users\Diederick\Anaconda22\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\.;$(VcpkgRoot)include\python2.7\;$(PROGRAMFILES)\SMI\iView X SDK\include;..\Dependency\windowstimestampproject\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)output\$(Platform);..\..\Dependency\windowstimestampproject\lib\$(Configuration)\$(Platform);%(AdditionalDependencies)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)output\$(Platform);$(PROGRAMFILES)\SMI\iView X SDK\lib;..\..\Dependency\windowstimestampproject\lib\$(Configuration)\$(Platform)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
       <AdditionalDependencies>legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -129,13 +129,13 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\.;..\..\Dependency\boost;C:\Users\Diederick\Anaconda2\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\.;$(VcpkgRoot)include\python2.7\;$(PROGRAMFILES)\SMI\iView X SDK\include;..\Dependency\windowstimestampproject\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)output\$(Platform);..\..\Dependency\windowstimestampproject\lib\$(Configuration)\$(Platform);%(AdditionalDependencies)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)output\$(Platform);$(PROGRAMFILES)\SMI\iView X SDK\lib;..\..\Dependency\windowstimestampproject\lib\$(Configuration)\$(Platform)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -145,12 +145,12 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\.;..\..\Dependency\boost;C:\Users\Diederick\Anaconda2\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\.;$(VcpkgRoot)include\python2.7\;$(PROGRAMFILES)\SMI\iView X SDK\include;..\Dependency\windowstimestampproject\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)output\$(Platform);..\..\Dependency\windowstimestampproject\lib\$(Configuration)\$(Platform);%(AdditionalDependencies)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)output\$(Platform);$(PROGRAMFILES)\SMI\iView X SDK\lib;..\..\Dependency\windowstimestampproject\lib\$(Configuration)\$(Platform)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

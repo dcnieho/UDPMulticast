@@ -28,6 +28,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="test.py" />
+    <Compile Include="UDPClient\bit32\__init__.py" />
+    <Compile Include="UDPClient\bit64\__init__.py" />
     <Compile Include="UDPClient\__init__.py" />
   </ItemGroup>
   <ItemGroup>
@@ -42,6 +44,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="UDPClient\" />
+    <Folder Include="UDPClient\bit32\" />
+    <Folder Include="UDPClient\bit64\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
