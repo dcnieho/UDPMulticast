@@ -28,3 +28,8 @@ Tobii_C_SDK\32\lib\tobii_research.dll -> vcpkg\installed\x86-windows\debug\bin
 Tobii_C_SDK\32\lib\tobii_research.lib -> vcpkg\installed\x86-windows\lib
 Tobii_C_SDK\32\lib\tobii_research.lib -> vcpkg\installed\x86-windows\debug\lib
 Tobii_C_SDK\32\include\*              -> vcpkg\installed\x86-windows\include
+
+
+if you wish to compile the python lib, further run:
+vcpkg install boost-python boost-python:x64-windows
+(for python2 support, edit the file ports\boost-python\CONTROL in the vcpkg directory to include python 2 instead of python 3. Later, a boost-python2 package may become available solving this)
