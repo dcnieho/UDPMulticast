@@ -96,11 +96,11 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\.;$(MATLAB32_ROOT)\extern\include;$(PROGRAMFILES)\SMI\iView X SDK\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\.;$(MATLAB32_ROOT)\extern\include;$(PROGRAMFILES)\SMI\iView X SDK\include;..\Dependency\windowstimestampproject\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)output\$(Platform);$(MATLAB32_ROOT)\extern\lib\win32\microsoft;$(PROGRAMFILES)\SMI\iView X SDK\lib;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)output\$(Platform);$(PROGRAMFILES)\SMI\iView X SDK\lib;..\..\Dependency\windowstimestampproject\lib\$(Configuration)\$(Platform)\;$(MATLAB32_ROOT)\extern\lib\win32\microsoft;</AdditionalLibraryDirectories>
       <AdditionalDependencies>legacy_stdio_definitions.lib;libmx.lib;libmex.lib;libmat.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/export:mexFunction %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -110,11 +110,11 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\.;$(MATLAB_ROOT)\extern\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\.;$(MATLAB_ROOT)\extern\include;$(PROGRAMFILES)\SMI\iView X SDK\include;..\Dependency\windowstimestampproject\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)output\$(Platform);$(MATLAB_ROOT)\extern\lib\win64\microsoft;$(PROGRAMFILES)\SMI\iView X SDK\lib;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)output\$(Platform);$(PROGRAMFILES)\SMI\iView X SDK\lib;..\..\Dependency\windowstimestampproject\lib\$(Configuration)\$(Platform)\;$(MATLAB_ROOT)\extern\lib\win64\microsoft;</AdditionalLibraryDirectories>
       <AdditionalDependencies>legacy_stdio_definitions.lib;libmx.lib;libmex.lib;libmat.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/export:mexFunction %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -126,7 +126,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\.;$(MATLAB32_ROOT)\extern\include;$(PROGRAMFILES)\SMI\iView X SDK\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\.;$(MATLAB32_ROOT)\extern\include;$(PROGRAMFILES)\SMI\iView X SDK\include;..\Dependency\windowstimestampproject\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDLL;HAS_SMI_INTEGRATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -134,7 +134,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>legacy_stdio_definitions.lib;libmx.lib;libmex.lib;libmat.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)output\$(Platform);$(MATLAB32_ROOT)\extern\lib\win32\microsoft;$(PROGRAMFILES)\SMI\iView X SDK\lib;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)output\$(Platform);$(PROGRAMFILES)\SMI\iView X SDK\lib;..\..\Dependency\windowstimestampproject\lib\$(Configuration)\$(Platform)\;$(MATLAB32_ROOT)\extern\lib\win32\microsoft;</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -144,13 +144,13 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\.;$(MATLAB_ROOT)\extern\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\.;$(MATLAB_ROOT)\extern\include;$(PROGRAMFILES)\SMI\iView X SDK\include;..\Dependency\windowstimestampproject\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)output\$(Platform);$(MATLAB_ROOT)\extern\lib\win64\microsoft;$(PROGRAMFILES)\SMI\iView X SDK\lib;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)output\$(Platform);$(PROGRAMFILES)\SMI\iView X SDK\lib;..\..\Dependency\windowstimestampproject\lib\$(Configuration)\$(Platform)\;$(MATLAB_ROOT)\extern\lib\win64\microsoft;</AdditionalLibraryDirectories>
       <AdditionalDependencies>legacy_stdio_definitions.lib;libmx.lib;libmex.lib;libmat.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
