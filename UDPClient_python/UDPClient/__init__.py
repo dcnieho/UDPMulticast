@@ -1,4 +1,9 @@
-﻿from UDPClient_python import *
+﻿# load in correct pyd, depending on whether this is an 32 or 64 bit environment
+import sys
+if sys.maxsize > 2**32:
+    from bit64 import *
+else:
+    from bit32 import *
 
 
 # TODO: add pure python functions as per

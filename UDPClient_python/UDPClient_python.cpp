@@ -72,6 +72,29 @@ void setComputerFilter(UDPMultiCast& udp_,list computerFilterList_)
     }
 }
 
+
+#ifdef HAS_TOBII_INTEGRATION
+void setTobiiScrSize(UDPMultiCast& udp_,list scrSize_)
+{
+    auto n = len(scrSize_);
+    if (n!=2)
+        ErrorMsgExit("setTobiiScrSize: argument must be a double array with two elements ([x,y] screen size)");
+    else
+    {
+        std::vector<double> arr;
+        for (boost::python::ssize_t i=0; i<n; i++)
+        {
+            extract<double> x(scrSize_[i]);	// check if contains double or something convertable to double
+            if (x.check())
+                arr.push_back(x());
+            else
+                ErrorMsgExit("setTobiiScrSize: argument must be a double array with two elements ([x,y] screen size). List contains python object that is not convertable to double");
+        }
+        udp_.setTobiiScrSize(arr);
+    }
+}
+#endif
+
 // tell boost.python about functions with optional arguments
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(sendWithTimeStamp_overloads, UDPMultiCast::sendWithTimeStamp, 1, 2);
 // start module scope
@@ -104,15 +127,15 @@ BOOST_PYTHON_MODULE(UDPClient_python)
 #ifdef HAS_SMI_INTEGRATION
         .def("startSMIDataSender", &UDPMultiCast::startSMIDataSender)
         .def("removeSMIDataSender", &UDPMultiCast::removeSMIDataSender)
-#endif // HAS_SMI_INTEGRATION
+#endif
         .def("hasTobiiIntegration", &UDPMultiCast::hasTobiiIntegration)
 #ifdef HAS_TOBII_INTEGRATION
         .def("connectToTobii", &UDPMultiCast::connectToTobii)
-        .def("connectToTobii", &UDPMultiCast::setTobiiScrSize)
+        .def("setTobiiScrSize", setTobiiScrSize)
         .def("setTobiiSampleRate", &UDPMultiCast::setTobiiSampleRate)
         .def("startTobiiDataSender", &UDPMultiCast::startTobiiDataSender)
         .def("removeTobiiDataSender", &UDPMultiCast::removeTobiiDataSender)
-#endif // HAS_SMI_INTEGRATION
+#endif
         ;
 
     // free functions

@@ -18,7 +18,10 @@ if udp.hasTobiiIntegration:
     udp.setTobiiScrSize([1920.,1080.]);
     udp.setTobiiSampleRate(600.);
     udp.startTobiiDataSender();
-    k = event.waitKeys()    # wait for any key to be pressed
+    try:
+        input("Press a key to continue...\n")    # wait for any key to be pressed
+    except SyntaxError:
+        pass
     udp.removeTobiiDataSender();
     dataMsgs = udp.getData();
 else:
