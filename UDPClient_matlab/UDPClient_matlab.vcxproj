@@ -114,7 +114,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)output\$(Platform);$(PROGRAMFILES)\SMI\iView X SDK\lib;..\..\Dependency\windowstimestampproject\lib\$(Configuration)\$(Platform)\;$(MATLAB_ROOT)\extern\lib\win64\microsoft;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)output\$(Platform);..\SMI64bitImportLib;..\..\Dependency\windowstimestampproject\lib\$(Configuration)\$(Platform)\;$(MATLAB_ROOT)\extern\lib\win64\microsoft;</AdditionalLibraryDirectories>
       <AdditionalDependencies>legacy_stdio_definitions.lib;libmx.lib;libmex.lib;libmat.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/export:mexFunction %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -150,7 +150,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)output\$(Platform);$(PROGRAMFILES)\SMI\iView X SDK\lib;..\..\Dependency\windowstimestampproject\lib\$(Configuration)\$(Platform)\;$(MATLAB_ROOT)\extern\lib\win64\microsoft;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)output\$(Platform);..\SMI64bitImportLib;..\..\Dependency\windowstimestampproject\lib\$(Configuration)\$(Platform)\;$(MATLAB_ROOT)\extern\lib\win64\microsoft;</AdditionalLibraryDirectories>
       <AdditionalDependencies>legacy_stdio_definitions.lib;libmx.lib;libmex.lib;libmat.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

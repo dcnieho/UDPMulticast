@@ -33,3 +33,5 @@ Tobii_C_SDK\32\include\*              -> vcpkg\installed\x86-windows\include
 if you wish to compile the python lib, further run:
 vcpkg install boost-python boost-python:x64-windows
 (for python2 support, edit the file ports\boost-python\CONTROL in the vcpkg directory to include python 2 instead of python 3. Later, a boost-python2 package may become available solving this)
+
+For the SMI SDK, there is an error in their import lib for the 64 version. This repo comes with a fixed version, in the folder SMI64bitImportLib
