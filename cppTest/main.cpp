@@ -21,7 +21,7 @@ int _tmain(int argc, _TCHAR* argv[])
     udp.setTobiiScrSize({1920., 1080.});
     udp.setTobiiSampleRate(600.f);
     udp.startTobiiDataSender();
-    std::cin.ignore();  // wait for any key press
+    std::cin.ignore();  // wait for enter key pressed
     udp.removeTobiiDataSender();
     std::vector<message> dataMsgs = udp.getData();
 #else

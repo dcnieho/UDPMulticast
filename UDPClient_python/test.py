@@ -15,9 +15,10 @@ UDPClient.getCurrentTime()    # warmup timestamper
 
 if udp.hasTobiiIntegration:
     udp.connectToTobii('tet-tcp://169.254.5.224');
+    udp.setTobiiScrSize([1920.,1080.]);
     udp.setTobiiSampleRate(600.);
     udp.startTobiiDataSender();
-    time.sleep(1)
+    k = event.waitKeys()    # wait for any key to be pressed
     udp.removeTobiiDataSender();
     dataMsgs = udp.getData();
 else:
