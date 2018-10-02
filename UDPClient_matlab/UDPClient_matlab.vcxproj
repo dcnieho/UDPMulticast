@@ -127,7 +127,6 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\.;$(MATLAB32_ROOT)\extern\include;$(PROGRAMFILES)\SMI\iView X SDK\include;..\Dependency\windowstimestampproject\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_WINDLL;HAS_SMI_INTEGRATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
