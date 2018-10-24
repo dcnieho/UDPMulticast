@@ -705,6 +705,7 @@ bool UDPMultiCast::connectToTobii(std::string address_)
     TobiiResearchStatus status = tobii_research_get_eyetracker(address_.c_str(),&_eyeTracker);
     if (status != TOBII_RESEARCH_STATUS_OK)
     {
+        _eyeTracker = nullptr;
         std::stringstream os;
         os << "connectToTobii: Cannot get eye tracker \"" << address_ << "\", ";
         os << "Error code: " << static_cast<int>(status);
