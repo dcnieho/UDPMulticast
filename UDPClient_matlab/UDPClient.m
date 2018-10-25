@@ -1,8 +1,13 @@
 % MATLAB class wrapper to underlying C++ class UDPClient
 
 classdef UDPClient < handle
+    properties (GetAccess = private, SetAccess = private, Hidden = true, Transient = true)
+        instanceHandle;         % integer handle to a class instance in MEX function
+    end
+    properties (GetAccess = protected, SetAccess = immutable, Hidden = false)
+        mexClassWrapperFnc;     % the MEX function owning the class instances
+    end
     properties (Access = private, Hidden = true)
-        objectHandle; % Handle to the underlying C++ class instance
         computerFilter = [];
         debugLevel = 0;
         
@@ -12,26 +17,60 @@ classdef UDPClient < handle
         hasSMIIntegration;
         hasTobiiIntegration;
     end
+    
+    
+    methods (Static = true)
+        function mexFnc = checkMEXFnc(mexFnc)
+            % Input function_handle or name, return valid handle or error
+            
+            % accept string or function_handle
+            if ischar(mexFnc)
+                mexFnc = str2func(mexFnc);
+            end
+            
+            % validate MEX-file function handle
+            % http://stackoverflow.com/a/19307825/2778484
+            funInfo = functions(mexFnc);
+            if exist(funInfo.file,'file') ~= 3  % status 3 is MEX-file
+                error('UDPClient:invalidMEXFunction','Invalid MEX file: "%s".',funInfo.file);
+            end
+        end
+    end
+    methods (Access = protected, Sealed = true)
+        function varargout = cppmethod(this, methodName, varargin)
+            if isempty(this.instanceHandle)
+                error('UDPClient:invalidHandle','No class handle. Did you call init yet?');
+            end
+            [varargout{1:nargout}] = this.mexClassWrapperFnc(methodName, this.instanceHandle, varargin{:});
+        end
+        
+        function varargout = cppmethodGlobal(this, methodName, varargin)
+            [varargout{1:nargout}] = this.mexClassWrapperFnc(methodName, varargin{:});
+        end
+    end
     methods
         %% Constructor - Create a new C++ class instance 
-        function this = UDPClient(varargin)
-            this.objectHandle       = UDPClient_matlab('new', varargin{:});
-            this.hasSMIIntegration  = UDPClient_matlab('hasSMIIntegration'  , this.objectHandle);
-            this.hasTobiiIntegration= UDPClient_matlab('hasTobiiIntegration', this.objectHandle);
+        function this = UDPClient()
+            this.mexClassWrapperFnc = this.checkMEXFnc('UDPClient_matlab');
+            
+            this.instanceHandle     = this.cppmethodGlobal('new');
+            
+            this.hasSMIIntegration  = this.cppmethod('hasSMIIntegration');
+            this.hasTobiiIntegration= this.cppmethod('hasTobiiIntegration');
         end
         
         %% Destructor - Destroy the C++ class instance
         function delete(this)
-            UDPClient_matlab('deInit', this.objectHandle);
-            UDPClient_matlab('delete', this.objectHandle);
+            this.cppmethod('deInit');
+            this.cppmethod('delete');
         end
 
         %% methods
         function init(this)
-            UDPClient_matlab('init', this.objectHandle);
+            this.cppmethod('init');
         end
         function deInit(this)
-            UDPClient_matlab('deInit', this.objectHandle);
+            this.cppmethod('deInit');
         end
         function sendWithTimeStamp(this, varargin)
             % check if first input is numeric, take that as the number of
@@ -47,25 +86,25 @@ classdef UDPClient < handle
             end
             % send message
             for p=1:nSend
-                UDPClient_matlab('sendWithTimeStamp', this.objectHandle, varargin{:});
+                this.cppmethod('sendWithTimeStamp', varargin{:});
             end
         end
         function send(this, varargin)
-            UDPClient_matlab('send', this.objectHandle, varargin{:});
+            this.cppmethod('send', varargin{:});
         end
         % check if receiver threads are still running. They may close when
         % an exit message is received. function returns how many threads
         % are running
         function numRunning = checkReceiverThreads(this)
-            numRunning = UDPClient_matlab('checkReceiverThreads', this.objectHandle);
+            numRunning = this.cppmethod('checkReceiverThreads');
         end
         
         % get the data and command messages received since the last call to this function
         function data = getData(this)
-            data = UDPClient_matlab('getData', this.objectHandle);
+            data = this.cppmethod('getData');
         end
         function cmds = getCommands(this)
-            cmds = UDPClient_matlab('getCommands', this.objectHandle);
+            cmds = this.cppmethod('getCommands');
         end
         % get data grouped by computer
         function data = getDataGrouped(this, computers)
@@ -142,68 +181,68 @@ classdef UDPClient < handle
         
         % getters and setters
         function gitRefID = getGitRefID(this)
-            gitRefID = UDPClient_matlab('getGitRefID', this.objectHandle);
+            gitRefID = this.cppmethod('getGitRefID');
         end
         function setUseWTP(this, varargin)
-            UDPClient_matlab('setUseWTP', this.objectHandle, varargin{:});
+            this.cppmethod('setUseWTP', varargin{:});
         end
         function setMaxClockRes(this, varargin)
-            UDPClient_matlab('setMaxClockRes', this.objectHandle, varargin{:});
+            this.cppmethod('setMaxClockRes', varargin{:});
         end
         function loopback = getLoopBack(this)
-            loopback = UDPClient_matlab('getLoopBack', this.objectHandle);
+            loopback = this.cppmethod('getLoopBack');
         end
         function setLoopBack(this, varargin)
-            UDPClient_matlab('setLoopBack', this.objectHandle, varargin{:});
+            this.cppmethod('setLoopBack', varargin{:});
         end
         function reuseSocket = getReuseSocket(this)
-            reuseSocket = UDPClient_matlab('getReuseSocket', this.objectHandle);
+            reuseSocket = this.cppmethod('getReuseSocket');
         end
         function setReuseSocket(this, varargin)
-            UDPClient_matlab('setReuseSocket', this.objectHandle, varargin{:});
+            this.cppmethod('setReuseSocket', varargin{:});
         end
         function groupAddress = getGroupAddress(this)
-            groupAddress = UDPClient_matlab('getGroupAddress', this.objectHandle);
+            groupAddress = this.cppmethod('getGroupAddress');
         end
         function setGroupAddress(this, varargin)
-            UDPClient_matlab('setGroupAddress', this.objectHandle, varargin{:});
+            this.cppmethod('setGroupAddress', varargin{:});
         end
         function port = getPort(this)
-            port = UDPClient_matlab('getPort', this.objectHandle);
+            port = this.cppmethod('getPort');
         end
         function setPort(this, varargin)
-            UDPClient_matlab('setPort', this.objectHandle, varargin{:});
+            this.cppmethod('setPort', varargin{:});
         end
         function bufferSize = getBufferSize(this)
-            bufferSize = UDPClient_matlab('getBufferSize', this.objectHandle);
+            bufferSize = this.cppmethod('getBufferSize');
         end
         function setBufferSize(this, varargin)
-            UDPClient_matlab('setBufferSize', this.objectHandle, varargin{:});
+            this.cppmethod('setBufferSize', varargin{:});
         end
         function numQueuedReceives = getNumQueuedReceives(this)
-            numQueuedReceives = UDPClient_matlab('getNumQueuedReceives', this.objectHandle);
+            numQueuedReceives = this.cppmethod('getNumQueuedReceives');
         end
         function setNumQueuedReceives(this, varargin)
-            UDPClient_matlab('setNumQueuedReceives', this.objectHandle, varargin{:});
+            this.cppmethod('setNumQueuedReceives', varargin{:});
         end
         function numReceiverThreads = getNumReceiverThreads(this)
-            numReceiverThreads = UDPClient_matlab('getNumReceiverThreads', this.objectHandle);
+            numReceiverThreads = this.cppmethod('getNumReceiverThreads');
         end
         function setNumReceiverThreads(this, varargin)
-            UDPClient_matlab('setNumReceiverThreads', this.objectHandle, varargin{:});
+            this.cppmethod('setNumReceiverThreads', varargin{:});
         end
         function time = getCurrentTime(this)
-            time = UDPClient_matlab('getCurrentTime', this.objectHandle);
+            time = this.cppmethod('getCurrentTime');
         end
         
         % if compiled with SMI integration only
         function startSMIDataSender(this)
             assert(this.hasSMIIntegration,'Can''t startSMIDataSender, UDPClient mex compiled without SMI integration')
-            UDPClient_matlab('startSMIDataSender', this.objectHandle);
+            this.cppmethod('startSMIDataSender');
         end
         function removeSMIDataSender(this)
             assert(this.hasSMIIntegration,'Can''t removeSMIDataSender, UDPClient mex compiled without SMI integration')
-            UDPClient_matlab('removeSMIDataSender', this.objectHandle);
+            this.cppmethod('removeSMIDataSender');
         end
         
         % if compiled with Tobii integration only
@@ -212,23 +251,23 @@ classdef UDPClient < handle
             if isa(address,'string')
                 address = char(address);    % seems matlab also has a string type, shows up if user accidentally uses double quotes, convert to char
             end
-            UDPClient_matlab('connectToTobii', this.objectHandle, address);
+            this.cppmethod('connectToTobii', address);
         end
         function setTobiiScrSize(this,scrSize)
             assert(this.hasTobiiIntegration,'Can''t setTobiiScrSize, UDPClient mex compiled without Tobii integration')
-            UDPClient_matlab('setTobiiScrSize', this.objectHandle, scrSize);
+            this.cppmethod('setTobiiScrSize', scrSize);
         end
         function setTobiiSampleRate(this,sampleFreq)
             assert(this.hasTobiiIntegration,'Can''t setTobiiSampleRate, UDPClient mex compiled without Tobii integration')
-            UDPClient_matlab('setTobiiSampleRate', this.objectHandle, sampleFreq);
+            this.cppmethod('setTobiiSampleRate', sampleFreq);
         end
         function startTobiiDataSender(this)
             assert(this.hasTobiiIntegration,'Can''t startTobiiDataSender, UDPClient mex compiled without Tobii integration')
-            UDPClient_matlab('startTobiiDataSender', this.objectHandle);
+            this.cppmethod('startTobiiDataSender');
         end
         function removeTobiiDataSender(this)
             assert(this.hasTobiiIntegration,'Can''t removeTobiiDataSender, UDPClient mex compiled without Tobii integration')
-            UDPClient_matlab('removeTobiiDataSender', this.objectHandle);
+            this.cppmethod('removeTobiiDataSender');
         end
         
         
@@ -244,7 +283,7 @@ classdef UDPClient < handle
             % these samples on the matlab side, so there is no issue
             % anymore
             this.computerFilter = filter;
-            UDPClient_matlab('setComputerFilter', this.objectHandle, filter);
+            this.cppmethod('setComputerFilter', filter);
         end
         function setDebugLevel(this, debugLevel)
             % sets wanted debug output (each bit sets a different
