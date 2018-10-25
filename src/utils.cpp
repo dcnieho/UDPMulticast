@@ -1,12 +1,15 @@
 #include "UDPMultiCast/utils.h"
+
+#include <map>
+
 #ifdef HAS_WINDOWSTIMESTAMPPROJECT
 #   include "G_User.h"
 #	pragma comment(lib, "G_Lib.lib")
-#endif
 
 // to solve linker error of G_Lib.lib, which is compiled with older MSVC
 // not sure this would actually work if any of these functions are needed!
-extern "C" { FILE __iob_func[3] = { *stdin,*stdout,*stderr }; }
+extern "C" { FILE __iob_func[3] = {*stdin,*stdout,*stderr}; }
+#endif
 
 
 namespace
