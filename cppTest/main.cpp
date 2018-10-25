@@ -4,8 +4,6 @@
 #include <string>
 #include <iostream>
 
-#include "UDPMultiCast/strHash.h"
-
 int _tmain(int argc, _TCHAR* argv[])
 {
     UDPMultiCast udp;

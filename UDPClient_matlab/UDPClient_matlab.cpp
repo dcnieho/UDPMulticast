@@ -1,68 +1,191 @@
 #include "UDPMultiCast/UDPMultiCast.h"
 #define DLL_EXPORT_SYM __declspec(dllexport) 
 #include "mex.h"
-#include "class_handle.hpp"
-#include "UDPMultiCast/strHash.h"
 #include "UDPMultiCast/utils.h"
 
-#include <cwchar>
 #include <algorithm>
+#include <vector>
+#include <map>
+#include <memory>
+#include <string>
+#include <sstream>
+#include <atomic>
 
-mxArray* msgVectorToMatlab(std::vector<message> msgs_);
+namespace {
+    typedef UDPMultiCast class_type;
+    typedef unsigned int handle_type;
+    typedef std::pair<handle_type, std::shared_ptr<class_type>> indPtrPair_type;
+    typedef std::map<indPtrPair_type::first_type, indPtrPair_type::second_type> instanceMap_type;
+    typedef indPtrPair_type::second_type instPtr_t;
+
+    // List actions
+    enum class Action
+    {
+        Touch,
+        New,
+        Delete,
+
+        Init,
+        DeInit,
+        SendWithTimeStamp,
+        Send,
+        CheckReceiverThreads,
+        GetData,
+        GetCommands,
+        GetGitRefID,
+        SetUseWTP,
+        SetMaxClockRes,
+        GetLoopBack,
+        SetLoopBack,
+        GetReuseSocket,
+        SetReuseSocket,
+        GetGroupAddress,
+        SetGroupAddress,
+        GetPort,
+        SetPort,
+        GetBufferSize,
+        SetBufferSize,
+        GetNumQueuedReceives,
+        SetNumQueuedReceives,
+        GetNumReceiverThreads,
+        SetNumReceiverThreads,
+        SetComputerFilter,
+        GetCurrentTime,
+        HasSMIIntegration,
+    #ifdef HAS_SMI_INTEGRATION
+        StartSMIDataSender,
+        RemoveSMIDataSender,
+    #endif
+        HasTobiiIntegration,
+    #ifdef HAS_TOBII_INTEGRATION
+        ConnectToTobii,
+        SetTobiiScrSize,
+        SetTobiiSampleRate,
+        StartTobiiDataSender,
+        RemoveTobiiDataSender
+    #endif
+    };
+
+    // Map string (first input argument to mexFunction) to an Action
+    const std::map<std::string, Action> actionTypeMap =
+    {
+        { "touch",						Action::Touch },
+        { "new",						Action::New },
+        { "delete",						Action::Delete },
+
+        { "startSampleBuffering",		Action::Init },
+        { "deInit",		                Action::DeInit},
+        { "sendWithTimeStamp",		    Action::SendWithTimeStamp},
+        { "send",		                Action::Send},
+        { "checkReceiverThreads",		Action::CheckReceiverThreads},
+        { "getData",		            Action::GetData},
+        { "getCommands",		        Action::GetCommands},
+        { "getGitRefID",		        Action::GetGitRefID},
+        { "setUseWTP",		            Action::SetUseWTP},
+        { "setMaxClockRes",		        Action::SetMaxClockRes},
+        { "getLoopBack",		        Action::GetLoopBack},
+        { "setLoopBack",		        Action::SetLoopBack},
+        { "getReuseSocket",		        Action::GetReuseSocket},
+        { "setReuseSocket",		        Action::SetReuseSocket},
+        { "getGroupAddress",		    Action::GetGroupAddress},
+        { "setGroupAddress",		    Action::SetGroupAddress},
+        { "getPort",		            Action::GetPort},
+        { "setPort",		            Action::SetPort},
+        { "getBufferSize",		        Action::GetBufferSize},
+        { "setBufferSize",		        Action::SetBufferSize},
+        { "getNumQueuedReceives",		Action::GetNumQueuedReceives},
+        { "setNumQueuedReceives",		Action::SetNumQueuedReceives},
+        { "getNumReceiverThreads",		Action::GetNumReceiverThreads},
+        { "setNumReceiverThreads",		Action::SetNumReceiverThreads},
+        { "setComputerFilter",		    Action::SetComputerFilter},
+        { "getCurrentTime",		        Action::GetCurrentTime},
+        { "hasSMIIntegration",		    Action::HasSMIIntegration},
+    #ifdef HAS_SMI_INTEGRATION
+        { "startSMIDataSender",		    Action::StartSMIDataSender},
+        { "removeSMIDataSender",		Action::RemoveSMIDataSender},
+    #endif
+        { "hasTobiiIntegration",		Action::HasTobiiIntegration},
+    #ifdef HAS_TOBII_INTEGRATION
+        { "connectToTobii",		        Action::ConnectToTobii},
+        { "setTobiiScrSize",		    Action::SetTobiiScrSize},
+        { "setTobiiSampleRate",		    Action::SetTobiiSampleRate},
+        { "startTobiiDataSender",		Action::StartTobiiDataSender},
+        { "removeTobiiDataSender",		Action::RemoveTobiiDataSender},
+    #endif
+    };
+
+    // table mapping handles to instances
+    static instanceMap_type instanceTab;
+    // for unique handles
+    std::atomic<handle_type> handleVal = {0};
+
+    // getHandle pulls the integer handle out of prhs[1]
+    handle_type getHandle(int nrhs, const mxArray *prhs[])
+    {
+        if (nrhs < 2 || !mxIsScalar(prhs[1]))
+            mexErrMsgTxt("Specify an instance with an integer handle.");
+        return static_cast<handle_type>(mxGetScalar(prhs[1]));
+    }
+
+    // checkHandle gets the position in the instance table
+    instanceMap_type::const_iterator checkHandle(const instanceMap_type& m, handle_type h)
+    {
+        auto it = m.find(h);
+        if (it == m.end())
+        {
+            std::stringstream ss; ss << "No instance corresponding to handle " << h << " found.";
+            mexErrMsgTxt(ss.str().c_str());
+        }
+        return it;
+    }
+
+    // forward declare
+    mxArray* msgVectorToMatlab(std::vector<message> msgs_);
+}
+
 
 void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-    // Get the command string
-    char cmd[64] = {0};
-    if (nrhs < 1 || mxGetString(prhs[0], cmd, sizeof(cmd)))
-        mexErrMsgTxt("First input should be a command string less than 64 characters long.");
-    size_t nChar = std::min(strlen(cmd),size_t(64));
+    if (nrhs < 1 || !mxIsChar(prhs[0]))
+        mexErrMsgTxt("First input must be an action string ('new', 'delete', or a method name).");
 
-    // New
-    if (!strcmp("new", cmd)) {
-        // Check parameters
-        if (nlhs != 1)
-            mexErrMsgTxt("New: One output expected.");
-        // Return a handle to a new C++ instance
-        plhs[0] = convertPtr2Mat<UDPMultiCast>(new UDPMultiCast);
-        return;
-    }
+    // get action string
+    char *actionCstr = mxArrayToString(prhs[0]);
+    std::string actionStr(actionCstr);
+    mxFree(actionCstr);
 
-    // Check there is a second input, which should be the class instance handle
-    if (nrhs < 2)
-        mexErrMsgTxt("Second input should be a class instance handle.");
+    // get corresponding action
+    if (actionTypeMap.count(actionStr) == 0)
+        mexErrMsgTxt(("Unrecognized action (not in actionTypeMap): " + actionStr).c_str());
+    Action action = actionTypeMap.at(actionStr);
 
-    // Delete
-    if (!strcmp("delete", cmd)) {
-        // Destroy the C++ object
-        destroyObject<UDPMultiCast>(prhs[1]);
-        // Warn if other commands were ignored
-        if (nlhs != 0 || nrhs != 2)
-            mexWarnMsgTxt("Delete: Unexpected arguments ignored.");
-        return;
-    }
-
-    // Get the class instance pointer from the second input
-    UDPMultiCast *UDPinstance = convertMat2Ptr<UDPMultiCast>(prhs[1]);
-
-    // Call the various class methods
-    switch (rt::crc32(cmd,nChar))
+    // If action is not "new" or others that don't require a handle, try to locate an existing instance based on input handle
+    instanceMap_type::const_iterator instIt;
+    instPtr_t instance;
+    if (action != Action::Touch && action != Action::New)
     {
-    case ct::crc32("init"):
+        instIt = checkHandle(instanceTab, getHandle(nrhs, prhs));
+        instance = instIt->second;
+    }
+
+    // execute action
+    switch (action)
+    {
+    case Action::Init:
         // Check parameters
         if (nlhs < 0 || nrhs < 2)
             mexErrMsgTxt("init: Unexpected arguments.");
         // Call the method
-        UDPinstance->init();
+        instance->init();
         return;
-    case ct::crc32("deInit"):
+    case Action::DeInit:
         // Check parameters
         if (nlhs < 0 || nrhs < 2)
             mexErrMsgTxt("deInit: Unexpected arguments.");
         // Call the method
-        UDPinstance->deInit();
+        instance->deInit();
         return;
-    case ct::crc32("sendWithTimeStamp"):
+    case Action::SendWithTimeStamp:
     {
         // Check parameters
         if (nlhs < 0 || nrhs < 3)
@@ -83,14 +206,14 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         }
         // Call the method
         char *str;
-        int64_t timeStamp = UDPinstance->sendWithTimeStamp(str = mxArrayToString(prhs[2]),delim);
+        int64_t timeStamp = instance->sendWithTimeStamp(str = mxArrayToString(prhs[2]),delim);
         mxFree(str);
         // return timestamp
         plhs[0] = mxCreateNumericMatrix(1, 1, mxINT64_CLASS, mxREAL);
         *static_cast<int64_t*>(mxGetData(plhs[0])) = timeStamp;
         return;
     }
-    case ct::crc32("send"):
+    case Action::Send:
     {
         // Check parameters
         if (nlhs < 0 || nrhs < 3)
@@ -99,40 +222,40 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
             mexErrMsgTxt("send: Expected msg argument to be a string.");
         // Call the method
         char *str;
-        UDPinstance->send(str = mxArrayToString(prhs[2]));
+        instance->send(str = mxArrayToString(prhs[2]));
         mxFree(str);
         return;
     }
-    case ct::crc32("checkReceiverThreads"):
+    case Action::CheckReceiverThreads:
         // Check parameters
         if (nlhs < 1 || nrhs < 2)
             mexErrMsgTxt("checkReceiverThreads: Unexpected arguments.");
         // Call the method
-        plhs[0] = mxCreateDoubleScalar(UDPinstance->checkReceiverThreads());
+        plhs[0] = mxCreateDoubleScalar(instance->checkReceiverThreads());
         return;
-    case ct::crc32("getData"):
+    case Action::GetData:
         // Check parameters
         if (nlhs < 1 || nrhs < 2)
             mexErrMsgTxt("getData: Unexpected arguments.");
         // Call the method
-        plhs[0] = msgVectorToMatlab(UDPinstance->getData());
+        plhs[0] = msgVectorToMatlab(instance->getData());
         return;
-    case ct::crc32("getCommands"):
+    case Action::GetCommands:
         // Check parameters
         if (nlhs < 1 || nrhs < 2)
             mexErrMsgTxt("getCommands: Unexpected arguments.");
         // Call the method
-        plhs[0] = msgVectorToMatlab(UDPinstance->getCommands());
+        plhs[0] = msgVectorToMatlab(instance->getCommands());
         return;
 
-    case ct::crc32("getGitRefID"):
+    case Action::GetGitRefID:
         // Check parameters
         if (nlhs < 1 || nrhs < 2)
             mexErrMsgTxt("getGitRefID: Unexpected arguments.");
         // Call the method
-        plhs[0] = mxCreateString(UDPinstance->getGitRefID().c_str());
+        plhs[0] = mxCreateString(instance->getGitRefID().c_str());
         return;
-    case ct::crc32("setUseWTP"):
+    case Action::SetUseWTP:
     {
         // Check parameters
         if (nlhs < 0 || nrhs < 3)
@@ -145,10 +268,10 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         else
             useWTP = mxIsLogicalScalarTrue(prhs[2]);
         // Call the method
-        UDPinstance->setUseWTP(useWTP);
+        instance->setUseWTP(useWTP);
         return;
     }
-    case ct::crc32("setMaxClockRes"):
+    case Action::SetMaxClockRes:
     {
         // Check parameters
         if (nlhs < 0 || nrhs < 3)
@@ -161,17 +284,17 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         else
             setMaxClockRes = mxIsLogicalScalarTrue(prhs[2]);
         // Call the method
-        UDPinstance->setMaxClockRes(setMaxClockRes);
+        instance->setMaxClockRes(setMaxClockRes);
         return;
     }
-    case ct::crc32("getLoopBack"):
+    case Action::GetLoopBack:
         // Check parameters
         if (nlhs < 1 || nrhs < 2)
             mexErrMsgTxt("getLoopBack: Unexpected arguments.");
         // Call the method
-        plhs[0] = mxCreateLogicalScalar(!!UDPinstance->getLoopBack());
+        plhs[0] = mxCreateLogicalScalar(!!instance->getLoopBack());
         return;
-    case ct::crc32("setLoopBack"):
+    case Action::SetLoopBack:
     {
         // Check parameters
         if (nlhs < 0 || nrhs < 3)
@@ -184,17 +307,17 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         else
             loopback = mxIsLogicalScalarTrue(prhs[2]);
         // Call the method
-        UDPinstance->setLoopBack(loopback);
+        instance->setLoopBack(loopback);
         return;
     }
-    case ct::crc32("getReuseSocket"):
+    case Action::GetReuseSocket:
         // Check parameters
         if (nlhs < 1 || nrhs < 2)
             mexErrMsgTxt("getReuseSocket: Unexpected arguments.");
         // Call the method
-        plhs[0] = mxCreateLogicalScalar(!!UDPinstance->getReuseSocket());
+        plhs[0] = mxCreateLogicalScalar(!!instance->getReuseSocket());
         return;
-    case ct::crc32("setReuseSocket"):
+    case Action::SetReuseSocket:
     {
         // Check parameters
         if (nlhs < 0 || nrhs < 3)
@@ -207,17 +330,17 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         else
             reuseSocket = mxIsLogicalScalarTrue(prhs[2]);
         // Call the method
-        UDPinstance->setReuseSocket(reuseSocket);
+        instance->setReuseSocket(reuseSocket);
         return;
     }
-    case ct::crc32("getGroupAddress"):
+    case Action::GetGroupAddress:
         // Check parameters
         if (nlhs < 1 || nrhs < 2)
             mexErrMsgTxt("getGroupAddress: Unexpected arguments.");
         // Call the method
-        plhs[0] = mxCreateString(UDPinstance->getGroupAddress().c_str());
+        plhs[0] = mxCreateString(instance->getGroupAddress().c_str());
         return;
-    case ct::crc32("setGroupAddress"):
+    case Action::SetGroupAddress:
     {
         // Check parameters
         if (nlhs < 0 || nrhs < 3)
@@ -226,84 +349,84 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
             mexErrMsgTxt("setGroupAddress: Expected groupAddress argument to be a string.");
         // Call the method
         char *str;
-        UDPinstance->setGroupAddress(str = mxArrayToString(prhs[2]));
+        instance->setGroupAddress(str = mxArrayToString(prhs[2]));
         mxFree(str);
         return;
     }
-    case ct::crc32("getPort"):
+    case Action::GetPort:
         // Check parameters
         if (nlhs < 1 || nrhs < 2)
             mexErrMsgTxt("getPort: Unexpected arguments.");
         // Call the method
-        plhs[0] = mxCreateDoubleScalar(UDPinstance->getPort());
+        plhs[0] = mxCreateDoubleScalar(instance->getPort());
         return;
-    case ct::crc32("setPort"):
+    case Action::SetPort:
         // Check parameters
         if (nlhs < 0 || nrhs < 3)
             mexErrMsgTxt("setPort: Expected port input.");
         if (!mxIsDouble(prhs[2]) || mxIsComplex(prhs[2]) || !mxIsScalar(prhs[2]))
             mexErrMsgTxt("setPort: Expected argument to be a double scalar.");
         // Call the method
-        UDPinstance->setPort(static_cast<unsigned short>(mxGetScalar(prhs[2])));
+        instance->setPort(static_cast<unsigned short>(mxGetScalar(prhs[2])));
         return;
-    case ct::crc32("getBufferSize"):
+    case Action::GetBufferSize:
         // Check parameters
         if (nlhs < 1 || nrhs < 2)
             mexErrMsgTxt("getBufferSize: Unexpected arguments.");
         // Call the method
-        plhs[0] = mxCreateDoubleScalar(UDPinstance->getBufferSize());
+        plhs[0] = mxCreateDoubleScalar(instance->getBufferSize());
         return;
-    case ct::crc32("setBufferSize"):
+    case Action::SetBufferSize:
         // Check parameters
         if (nlhs < 0 || nrhs < 3)
             mexErrMsgTxt("setBufferSize: Expected buffer size input.");
         if (!mxIsDouble(prhs[2]) || mxIsComplex(prhs[2]) || !mxIsScalar(prhs[2]))
             mexErrMsgTxt("setBufferSize: Expected argument to be a double scalar.");
         // Call the method
-        UDPinstance->setBufferSize(static_cast<size_t>(mxGetScalar(prhs[2])));
+        instance->setBufferSize(static_cast<size_t>(mxGetScalar(prhs[2])));
         return;
-    case ct::crc32("getNumQueuedReceives"):
+    case Action::GetNumQueuedReceives:
         // Check parameters
         if (nlhs < 1 || nrhs < 2)
             mexErrMsgTxt("getNumQueuedReceives: Unexpected arguments.");
         // Call the method
-        plhs[0] = mxCreateDoubleScalar(UDPinstance->getNumQueuedReceives());
+        plhs[0] = mxCreateDoubleScalar(instance->getNumQueuedReceives());
         return;
-    case ct::crc32("setNumQueuedReceives"):
+    case Action::SetNumQueuedReceives:
         // Check parameters
         if (nlhs < 0 || nrhs < 3)
             mexErrMsgTxt("setNumQueuedReceives: Expected number of queued receives input.");
         if (!mxIsDouble(prhs[2]) || mxIsComplex(prhs[2]) || !mxIsScalar(prhs[2]))
             mexErrMsgTxt("setNumQueuedReceives: Expected argument to be a double scalar.");
         // Call the method
-        UDPinstance->setNumQueuedReceives(static_cast<unsigned long>(mxGetScalar(prhs[2])));
+        instance->setNumQueuedReceives(static_cast<unsigned long>(mxGetScalar(prhs[2])));
         return;
-    case ct::crc32("getNumReceiverThreads"):
+    case Action::GetNumReceiverThreads:
         // Check parameters
         if (nlhs < 1 || nrhs < 2)
             mexErrMsgTxt("getNumReceiverThreads: Unexpected arguments.");
         // Call the method
-        plhs[0] = mxCreateDoubleScalar(UDPinstance->getNumReceiverThreads());
+        plhs[0] = mxCreateDoubleScalar(instance->getNumReceiverThreads());
         return;
-    case ct::crc32("setNumReceiverThreads"):
+    case Action::SetNumReceiverThreads:
         // Check parameters
         if (nlhs < 0 || nrhs < 3)
             mexErrMsgTxt("setNumReceiverThreads: Expected number of receiver threads input.");
         if (!mxIsDouble(prhs[2]) || mxIsComplex(prhs[2]) || !mxIsScalar(prhs[2]))
             mexErrMsgTxt("setNumReceiverThreads: Expected argument to be a double scalar.");
         // Call the method
-        UDPinstance->setNumReceiverThreads(static_cast<unsigned long>(mxGetScalar(prhs[2])));
+        instance->setNumReceiverThreads(static_cast<unsigned long>(mxGetScalar(prhs[2])));
         return;
-    case ct::crc32("setComputerFilter"):
+    case Action::SetComputerFilter:
         // Check parameters
         if (nlhs < 0 || nrhs < 3)
             mexErrMsgTxt("setComputerFilter: Expected (possibly empty) array of computers from which you want to receive messages.");
         if (!mxIsDouble(prhs[2]) || mxIsComplex(prhs[2]))
             mexErrMsgTxt("setComputerFilter: Array of computers from which you want to receive messages should be double.");
         // Call the method
-        UDPinstance->setComputerFilter(mxGetPr(prhs[2]), mxGetNumberOfElements(prhs[2]));
+        instance->setComputerFilter(mxGetPr(prhs[2]), mxGetNumberOfElements(prhs[2]));
         return;
-    case ct::crc32("getCurrentTime"):
+    case Action::GetCurrentTime:
         // Check parameters
         if (nlhs < 1 || nrhs < 2)
             mexErrMsgTxt("getCurrentTime: Unexpected arguments.");
@@ -311,82 +434,86 @@ void DLL_EXPORT_SYM mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArr
         plhs[0] = mxCreateNumericMatrix(1, 1, mxINT64_CLASS, mxREAL);
         *static_cast<int64_t*>(mxGetData(plhs[0])) = timeUtils::getTimeStamp();
         return;
-    case ct::crc32("hasSMIIntegration"):
+    case Action::HasSMIIntegration:
         plhs[0] = mxCreateNumericMatrix(1, 1, mxLOGICAL_CLASS, mxREAL);
-        *static_cast<bool*>(mxGetData(plhs[0])) = UDPinstance->hasSMIIntegration();
+        *static_cast<bool*>(mxGetData(plhs[0])) = instance->hasSMIIntegration();
         return;
 #ifdef HAS_SMI_INTEGRATION
-    case ct::crc32("startSMIDataSender"):
-        UDPinstance->startSMIDataSender();
+    case Action::StartSMIDataSender:
+        instance->startSMIDataSender();
         return;
-    case ct::crc32("removeSMIDataSender"):
-        UDPinstance->removeSMIDataSender();
+    case Action::RemoveSMIDataSender:
+        instance->removeSMIDataSender();
         return;
 #endif
-    case ct::crc32("hasTobiiIntegration"):
+    case Action::HasTobiiIntegration:
         plhs[0] = mxCreateNumericMatrix(1, 1, mxLOGICAL_CLASS, mxREAL);
-        *static_cast<bool*>(mxGetData(plhs[0])) = UDPinstance->hasTobiiIntegration();
+        *static_cast<bool*>(mxGetData(plhs[0])) = instance->hasTobiiIntegration();
         return;
 #ifdef HAS_TOBII_INTEGRATION
-    case ct::crc32("connectToTobii"):
+    case Action::ConnectToTobii:
     {
         if (nrhs < 2 || !mxIsChar(prhs[2]))
             mexErrMsgTxt("connectToTobii: Third argument must be a string.");
 
         char* address = mxArrayToString(prhs[2]);
-        UDPinstance->connectToTobii(address);
+        instance->connectToTobii(address);
         mxFree(address);
         return;
     }
-    case ct::crc32("setTobiiScrSize"):
+    case Action::SetTobiiScrSize:
     {
         if (nrhs < 2 || !mxIsDouble(prhs[2]) || mxIsComplex(prhs[2]) || mxGetNumberOfElements(prhs[2]) != 2)
             mexErrMsgTxt("setTobiiScrSize: Third argument must be a double array with two elements ([x,y] screen size).");
 
-        UDPinstance->setTobiiScrSize({*mxGetPr(prhs[2]),*(mxGetPr(prhs[2]) + 1)});
+        instance->setTobiiScrSize({*mxGetPr(prhs[2]),*(mxGetPr(prhs[2]) + 1)});
         return;
     }
-    case ct::crc32("setTobiiSampleRate"):
+    case Action::SetTobiiSampleRate:
     {
         if (nrhs < 2 || !mxIsDouble(prhs[2]) || mxIsComplex(prhs[2]))
             mexErrMsgTxt("setTobiiSampleRate: Third argument must be a double");
 
-        UDPinstance->setTobiiSampleRate(static_cast<float>(*mxGetPr(prhs[2])));
+        instance->setTobiiSampleRate(static_cast<float>(*mxGetPr(prhs[2])));
         return;
     }
-    case ct::crc32("startTobiiDataSender"):
-        UDPinstance->startTobiiDataSender();
+    case Action::StartTobiiDataSender:
+        instance->startTobiiDataSender();
         return;
-    case ct::crc32("removeTobiiDataSender"):
-        UDPinstance->removeTobiiDataSender();
+    case Action::RemoveTobiiDataSender:
+        instance->removeTobiiDataSender();
         return;
 #endif
     default:
-        // Got here, so command not recognized
-        mexErrMsgTxt("Command not recognized.");
+        mexErrMsgTxt(("Unhandled action: " + actionStr).c_str());
+        break;
     }
 }
 
-mxArray* msgVectorToMatlab(std::vector<message> msgs_)
+// helpers
+namespace
 {
-    const char* fieldNames[] = { "text", "timeStamp", "ip" };
-    mxArray* out = mxCreateStructMatrix(1, msgs_.size(), sizeof(fieldNames) / sizeof(*fieldNames), fieldNames);
-    size_t i = 0;
-    for (auto &msg : msgs_)
+    mxArray* msgVectorToMatlab(std::vector<message> msgs_)
     {
-        mxSetFieldByNumber(out, i, 0, mxCreateString(msg.text.get()));
-        mxArray *temp;
-        mxSetFieldByNumber(out, i, 1, temp = mxCreateNumericMatrix(1, 1, mxINT64_CLASS, mxREAL));
-        *static_cast<int64_t*>(mxGetData(temp)) = msg.timeStamp;
-#ifdef IP_ADDR_AS_STR
-        mxSetFieldByNumber(out, i, 2, mxCreateString(msg.ip));
-#else
-        mxSetFieldByNumber(out, i, 2, temp = mxCreateNumericMatrix(1, 1, mxDOUBLE_CLASS, mxREAL));
-        *static_cast<double*>(mxGetData(temp)) = double(msg.ip);
-#endif
-        i++;
+        const char* fieldNames[] = {"text", "timeStamp", "ip"};
+        mxArray* out = mxCreateStructMatrix(1, msgs_.size(), sizeof(fieldNames) / sizeof(*fieldNames), fieldNames);
+        size_t i = 0;
+        for (auto &msg : msgs_)
+        {
+            mxSetFieldByNumber(out, i, 0, mxCreateString(msg.text.get()));
+            mxArray *temp;
+            mxSetFieldByNumber(out, i, 1, temp = mxCreateNumericMatrix(1, 1, mxINT64_CLASS, mxREAL));
+            *static_cast<int64_t*>(mxGetData(temp)) = msg.timeStamp;
+        #ifdef IP_ADDR_AS_STR
+            mxSetFieldByNumber(out, i, 2, mxCreateString(msg.ip));
+        #else
+            mxSetFieldByNumber(out, i, 2, temp = mxCreateNumericMatrix(1, 1, mxDOUBLE_CLASS, mxREAL));
+            *static_cast<double*>(mxGetData(temp)) = double(msg.ip);
+        #endif
+            i++;
+        }
+        return out;
     }
-    return out;
 }
 
 

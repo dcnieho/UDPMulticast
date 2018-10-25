@@ -587,20 +587,7 @@ MsgType UDPMultiCast::processMsg(const char *msg_, size_t *headerLen_, size_t *m
     char *header = new char[*headerLen_] {0};	// as headerLen_ includes comma, we've got space for null terminator
     memcpy(header, msg_, *headerLen_ - 1);	    // -1 is safe as we're pointing to idx 1 at minimum
 
-    // switchyard using constexpr cheapCrappyHash to hash switch values to integrals
-    // cheapCrappyHash is crappy because many collisions are possible and long strings don't fit in the returned integer (overflow!).
-    // For the three different strings below, it works and it is cheap to compute
-    switch (cheapCrappyHash(header))
-    {
-    case cheapCrappyHash("exit"):
-        return MsgType::exit;
-    case cheapCrappyHash("dat"):
-        return MsgType::data;
-    case cheapCrappyHash("cmd"):
-        return MsgType::command;
-    default:
-        return MsgType::unknown;
-    }
+    return strToMsgType(header);
 }
 
 void UDPMultiCast::setupLoopBack(const BOOL loopBack_)

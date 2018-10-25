@@ -1,6 +1,6 @@
 #pragma once
 #include "UDPMultiCast/includes.h"
-#include "UDPMultiCast/strHash.h"
+#include "UDPMultiCast/types.h"
 
 #include <string>
 #include <sstream>
@@ -15,6 +15,8 @@
 // the below function is called when an error occurred and application execution should halt
 // this function is not defined in this library, it is for the user to implement depending on his platform
 void DoExitWithMsg(std::string errMsg_);
+
+MsgType strToMsgType(std::string header_);
 
 
 inline std::string GetLastErrorMessage(

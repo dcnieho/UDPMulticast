@@ -75,6 +75,22 @@ namespace
         ((pSetTimerResolution)GetProcAddress(hLibrary, "NtSetTimerResolution"))(maxResolution, TRUE, &actualResolution);
         fprintf(stdout, "system timer set to resolution: %d\n", actualResolution);
     }
+
+    
+    // Map string to a MsgType
+    const std::map<std::string, MsgType> msgTypeMap =
+    {
+        { "exit",       MsgType::exit},
+        { "data",       MsgType::data},
+        { "command",    MsgType::command},
+    };
+}
+
+MsgType strToMsgType(std::string header_)
+{
+    if (msgTypeMap.count(header_) == 0)
+        return MsgType::unknown;
+    return msgTypeMap.at(header_);
 }
 
 

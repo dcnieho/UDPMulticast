@@ -21,9 +21,6 @@
     <ClInclude Include="UDPMultiCast\mpmcBoundedQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="UDPMultiCast\strHash.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="UDPMultiCast\types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -41,9 +38,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\strHash.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\UDPMultiCast.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
