@@ -71,7 +71,7 @@ namespace {
         { "new",						Action::New },
         { "delete",						Action::Delete },
 
-        { "startSampleBuffering",		Action::Init },
+        { "init",		                Action::Init },
         { "deInit",		                Action::DeInit},
         { "sendWithTimeStamp",		    Action::SendWithTimeStamp},
         { "send",		                Action::Send},
