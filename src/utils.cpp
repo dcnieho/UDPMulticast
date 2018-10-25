@@ -80,9 +80,9 @@ namespace
     // Map string to a MsgType
     const std::map<std::string, MsgType> msgTypeMap =
     {
-        { "exit",       MsgType::exit},
-        { "data",       MsgType::data},
-        { "command",    MsgType::command},
+        { "exit",   MsgType::exit},
+        { "dat",    MsgType::data},
+        { "cmd",    MsgType::command},
     };
 }
 
