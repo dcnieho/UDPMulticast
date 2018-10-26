@@ -1,6 +1,7 @@
 #pragma once
 #include "UDPMultiCast/includes.h"
 #include "UDPMultiCast/types.h"
+#include "UDPMultiCast/RAII.h"
 #include <vector>
 #include <string>
 #include <set>
@@ -78,16 +79,16 @@ private:
 private:
     // state
     bool _initialized = false;
-    SOCKET _socket;
-    HANDLE _hIOCP;
+    RAII::socket _socket;
+    RAII::handle _hIOCP;
     Threads _threads;
     bool _multiCastJoined = false;
     ip_mreq _multiCastRequest;
     sockaddr_in _multiCastGroup;
     // buffers
-    char *_pReceiveBuffers;
-    sockaddr_in *_pAddrBuffers;
-    EXTENDED_OVERLAPPED *_pExtOverlappedArray;
+    char *_pReceiveBuffers = nullptr;
+    sockaddr_in *_pAddrBuffers = nullptr;
+    EXTENDED_OVERLAPPED *_pExtOverlappedArray = nullptr;
     queue_t<4096> _receivedData;
     queue_t<512>  _receivedCommands;
     // filter for content to make it into the buffer

@@ -163,11 +163,13 @@
     <ClInclude Include="UDPMultiCast\config.h" />
     <ClInclude Include="UDPMultiCast\includes.h" />
     <ClInclude Include="UDPMultiCast\mpmcBoundedQueue.h" />
+    <ClInclude Include="UDPMultiCast\RAII.h" />
     <ClInclude Include="UDPMultiCast\types.h" />
     <ClInclude Include="UDPMultiCast\UDPMultiCast.h" />
     <ClInclude Include="UDPMultiCast\utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\RAII.cpp" />
     <ClCompile Include="src\UDPMultiCast.cpp" />
     <ClCompile Include="src\utils.cpp" />
   </ItemGroup>

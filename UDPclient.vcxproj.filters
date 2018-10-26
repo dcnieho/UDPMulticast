@@ -36,12 +36,18 @@
     <ClInclude Include="UDPMultiCast\includes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="UDPMultiCast\RAII.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\UDPMultiCast.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RAII.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

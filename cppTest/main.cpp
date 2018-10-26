@@ -14,7 +14,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
     timeUtils::getTimeStamp();  // warmup timestamper
 
-#ifdef HAS_TOBII_INTEGRATION
+#if defined(HAS_TOBII_INTEGRATION) && 1
     udp.connectToTobii("tet-tcp://169.254.5.224");
     udp.setTobiiScrSize({1920., 1080.});
     udp.setTobiiSampleRate(600.f);

@@ -50,8 +50,8 @@ void UDPMultiCast::init()
     }
 
     // create and set up socket
-    _socket = ::WSASocketW(AF_INET, SOCK_DGRAM, IPPROTO_UDP, NULL, 0, WSA_FLAG_OVERLAPPED);
-    if (_socket == INVALID_SOCKET)
+    _socket.set(::WSASocketW(AF_INET, SOCK_DGRAM, IPPROTO_UDP, NULL, 0, WSA_FLAG_OVERLAPPED));
+    if (_socket.get() == INVALID_SOCKET)
     {
         ErrorExit("WSASocket");
     }
@@ -66,7 +66,7 @@ void UDPMultiCast::init()
     // with winsocks, for a multicast socket, all sockets opened on the same port with SO_REUSEADDR receive all incoming packets
     if (_reuseSocket)
     {
-        if (SOCKET_ERROR == ::setsockopt(_socket, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<const char*>(&_reuseSocket), sizeof(_reuseSocket)))
+        if (SOCKET_ERROR == ::setsockopt(_socket.get(), SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<const char*>(&_reuseSocket), sizeof(_reuseSocket)))
         {
             ErrorExit("setsockopt SO_REUSEADDR");
         }
@@ -74,7 +74,7 @@ void UDPMultiCast::init()
 
     // TODO: read and understand: http://stackoverflow.com/questions/10692956/what-does-it-mean-to-bind-a-multicast-udp-socket
     // also, for a client it is recommended by the MSDN docs (without given reason) to not bind but WSAJoinLeaf
-    if (SOCKET_ERROR == ::bind(_socket, reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr)))
+    if (SOCKET_ERROR == ::bind(_socket.get(), reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr)))
     {
         ErrorExit("bind");
     }
@@ -89,12 +89,12 @@ void UDPMultiCast::init()
     // Though separate groups is a better idea if we want multiple smaller groups
 
     // setup IOCP port and associate socket handle
-    _hIOCP = ::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
-    if (0 == _hIOCP)
+    _hIOCP.set(::CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0));
+    if (0 == _hIOCP.get())
     {
         ErrorExit("CreateIoCompletionPort");
     }
-    if (0 == ::CreateIoCompletionPort(reinterpret_cast<HANDLE>(_socket), _hIOCP, 1, 0))
+    if (0 == ::CreateIoCompletionPort(reinterpret_cast<HANDLE>(_socket.get()), _hIOCP.get(), 1, 0))
     {
         ErrorExit("CreateIoCompletionPort");
     }
@@ -168,23 +168,20 @@ void UDPMultiCast::deInit()
     // send exit packet to IOCP threads and wait till all exited
     stopIOCP();
     waitIOCPThreadsStop();
+    _hIOCP.cleanUp();
 
     // release socket
-    if (SOCKET_ERROR == ::shutdown(_socket,2))
-    {
-        ErrorExit("shutdown");
-    }
-    if (SOCKET_ERROR == ::closesocket(_socket))
-    {
-        ErrorExit("closesocket");
-    }
+    _socket.cleanUp();
     // cleanup WinSocks
     WSACleanup();
 
     // free memory
-    delete[] _pExtOverlappedArray;
-    VirtualFree(_pReceiveBuffers, 0, MEM_RELEASE);
-    VirtualFree(_pAddrBuffers, 0, MEM_RELEASE);
+    if (_pExtOverlappedArray)
+        delete[] _pExtOverlappedArray;
+    if (_pReceiveBuffers)
+        VirtualFree(_pReceiveBuffers, 0, MEM_RELEASE);
+    if (_pAddrBuffers)
+        VirtualFree(_pAddrBuffers, 0, MEM_RELEASE);
 
     _initialized = false;
 }
@@ -236,7 +233,7 @@ void UDPMultiCast::sendInternal(EXTENDED_OVERLAPPED* sendOverlapped_)
 {
     // do send
     DWORD bytesSent = 0;
-    if (SOCKET_ERROR == ::WSASendTo(_socket, &(sendOverlapped_->buf), 1, &bytesSent, 0, reinterpret_cast<sockaddr*>(&_multiCastGroup), sizeof(_multiCastGroup), static_cast<OVERLAPPED *>(sendOverlapped_), 0))
+    if (SOCKET_ERROR == ::WSASendTo(_socket.get(), &(sendOverlapped_->buf), 1, &bytesSent, 0, reinterpret_cast<sockaddr*>(&_multiCastGroup), sizeof(_multiCastGroup), static_cast<OVERLAPPED *>(sendOverlapped_), 0))
     {
         const DWORD lastError = ::GetLastError();
 
@@ -256,7 +253,7 @@ void UDPMultiCast::receive(EXTENDED_OVERLAPPED* pExtOverlapped_, OVERLAPPED* pOv
     {
         pOverlapped = static_cast<OVERLAPPED *>(pExtOverlapped_);
     }
-    if (SOCKET_ERROR == ::WSARecvFrom(_socket, &(pExtOverlapped_->buf), 1, &bytesRecvd, &flags, (sockaddr*) pExtOverlapped_->addr, &(pExtOverlapped_->addrLen), pOverlapped, 0))
+    if (SOCKET_ERROR == ::WSARecvFrom(_socket.get(), &(pExtOverlapped_->buf), 1, &bytesRecvd, &flags, (sockaddr*) pExtOverlapped_->addr, &(pExtOverlapped_->addrLen), pOverlapped, 0))
     {
         const DWORD lastError = ::GetLastError();
 
@@ -300,7 +297,7 @@ void UDPMultiCast::setLoopBack(const BOOL& loopBack_)
 void UDPMultiCast::setReuseSocket(const BOOL& value_)
 {
     if (_initialized)
-        ErrorMsgExit("cannot reuse socket when already initialized");
+        ErrorMsgExit("cannot change whether socket can be reused when already initialized");
 
     _reuseSocket = value_;
 }
@@ -399,7 +396,8 @@ std::vector<message> UDPMultiCast::getCommands()
 void UDPMultiCast::stopIOCP()
 {
     // post exit message
-    PostQueuedCompletionStatus(_hIOCP, 0, 0, 0);
+    if (_hIOCP.get() != INVALID_HANDLE_VALUE)
+        PostQueuedCompletionStatus(_hIOCP.get(), 0, 0, 0);
 }
 
 void UDPMultiCast::waitIOCPThreadsStop()
@@ -459,7 +457,7 @@ unsigned int UDPMultiCast::threadFunction()
 
     for (;;)
     {
-        if (!::GetQueuedCompletionStatus(_hIOCP, &numberOfBytes, &completionKey, &pOverlapped, INFINITE))
+        if (!::GetQueuedCompletionStatus(_hIOCP.get(), &numberOfBytes, &completionKey, &pOverlapped, INFINITE))
         {
             if (!pOverlapped)
             {
@@ -492,7 +490,7 @@ unsigned int UDPMultiCast::threadFunction()
             // zero size and zero handle is my termination message
             // re-post, then break, so all threads on the IOCP will
             // one by one wake up and exit in a controlled manner
-            PostQueuedCompletionStatus(_hIOCP, 0, 0, 0);
+            PostQueuedCompletionStatus(_hIOCP.get(), 0, 0, 0);
             break;
         }
         else
@@ -527,7 +525,7 @@ unsigned int UDPMultiCast::threadFunction()
                         break;
                     case MsgType::exit:
                         // exit msg received, post exit msg to other threads and exit
-                        PostQueuedCompletionStatus(_hIOCP, 0, 0, 0);
+                        PostQueuedCompletionStatus(_hIOCP.get(), 0, 0, 0);
                         break;
                     case MsgType::data:
                         _receivedData.enqueue(message(senderIP,msgStart,receiveTimeStamp));
@@ -592,7 +590,7 @@ MsgType UDPMultiCast::processMsg(const char *msg_, size_t *headerLen_, size_t *m
 
 void UDPMultiCast::setupLoopBack(const BOOL loopBack_)
 {
-    if (SOCKET_ERROR == ::setsockopt(_socket, IPPROTO_IP, IP_MULTICAST_LOOP, reinterpret_cast<const char *>(&loopBack_), sizeof(loopBack_)))
+    if (SOCKET_ERROR == ::setsockopt(_socket.get(), IPPROTO_IP, IP_MULTICAST_LOOP, reinterpret_cast<const char *>(&loopBack_), sizeof(loopBack_)))
     {
         ErrorExit("setsockopt IP_MULTICAST_LOOP");
     }
@@ -610,7 +608,7 @@ void UDPMultiCast::setupAndJoinMultiCast()
 
     _multiCastRequest.imr_multiaddr.s_addr = _multiCastGroup.sin_addr.S_un.S_addr;
     _multiCastRequest.imr_interface.s_addr = INADDR_ANY;
-    if (SOCKET_ERROR == ::setsockopt(_socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, reinterpret_cast<char *>(&_multiCastRequest), sizeof(_multiCastRequest)))
+    if (SOCKET_ERROR == ::setsockopt(_socket.get(), IPPROTO_IP, IP_ADD_MEMBERSHIP, reinterpret_cast<char *>(&_multiCastRequest), sizeof(_multiCastRequest)))
     {
         ErrorExit("setsockopt IP_ADD_MEMBERSHIP");
     }
@@ -622,7 +620,7 @@ void UDPMultiCast::leaveMultiCast()
 {
     if (_multiCastJoined)
     {
-        if (SOCKET_ERROR == ::setsockopt(_socket, IPPROTO_IP, IP_DROP_MEMBERSHIP, reinterpret_cast<char *>(&_multiCastRequest), sizeof(_multiCastRequest)))
+        if (SOCKET_ERROR == ::setsockopt(_socket.get(), IPPROTO_IP, IP_DROP_MEMBERSHIP, reinterpret_cast<char *>(&_multiCastRequest), sizeof(_multiCastRequest)))
         {
             ErrorExit("setsockopt IP_DROP_MEMBERSHIP");
         }
