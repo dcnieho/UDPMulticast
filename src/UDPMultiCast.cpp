@@ -156,7 +156,7 @@ void UDPMultiCast::deInit()
         removeSMIDataSender();
 #endif
 
-    // remove smi callback
+    // remove tobii callback
 #ifdef HAS_TOBII_INTEGRATION
     if (_tobiiDataSenderStarted)
         removeTobiiDataSender();
@@ -733,7 +733,7 @@ bool UDPMultiCast::startTobiiDataSender()
 }
 void UDPMultiCast::removeTobiiDataSender()
 {
-    if (_eyeTracker)
+    if (_eyeTracker && _tobiiDataSenderStarted)
         tobii_research_unsubscribe_from_gaze_data(_eyeTracker, TobiiSampleCallback);
     else
         _tobiiDataSenderStarted = false;
