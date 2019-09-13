@@ -7,6 +7,8 @@ MATLAB and Python wrappers are provided. Both 32bit and 64bit are
 supported. Not all VS project settings are necessarily correct for all
 configurations though
 
+When using this tool, please cite `Niehorster, D.C., Cornelissen, T., Holmqvist, K. & Hooge, I.T.C (2019). Searching with and against each other: Spatiotemporal coordination of visual search behavior in collaborative and competitive settings. Attention, Perception, & Psychophys 81(3), 666–683. doi: 10.3758/s13414-018-01640-0`
+
 
 To use Tobii integration, setup somewhere out of this tree:
 clone https://github.com/Microsoft/vcpkg
