@@ -11,12 +11,14 @@ When using this tool, please cite `Niehorster, D.C., Cornelissen, T., Holmqvist,
 
 
 To use Tobii integration, setup somewhere out of this tree:
+```
 clone https://github.com/Microsoft/vcpkg
 git clone https://github.com/Microsoft/vcpkg.git
 
 cd vcpkg
 .\bootstrap-vcpkg.bat
 .\vcpkg integrate install
+```
 
 for Tobii SDK, you need to manually put the right files in the right place of the vcpkg directory:
 ```
